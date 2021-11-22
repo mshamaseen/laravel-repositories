@@ -1,0 +1,40 @@
+{
+    "name": "shamaseen/repository-generator",
+    "description": "repository pattern files generator",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mohammad Shamaseen",
+            "email": "m.shamaseen@outlook.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Shamaseen\\Repository\\": "src/"
+        },
+        "files": [
+            "vendor/laravel/framework/src/Illuminate/Foundation/helpers.php"
+        ]
+    },
+
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+    },
+    "require-dev": {
+        "shamaseen/laravel-files-generator": "^0.2",
+        "illuminate/console": ">5.7",
+        "illuminate/support": ">5.7",
+        "doctrine/dbal": ">2.8",
+        "illuminate/database": ">5.7",
+        "illuminate/routing": ">5.7",
+        "illuminate/validation": ">5.7"
+    }
+}
