@@ -1,0 +1,22 @@
+<?php
+namespace {{typeNamespace}}{{pathNamespace}};
+
+use {{ModelNamespace}}{{pathNamespace}}\{{modelName}};
+use {{parentClass}};
+
+/**
+ * Class {{modelName}}Repository
+ * @property-read {{modelName}} $model
+ */
+class {{modelName}}Repository extends AbstractRepository
+{
+    protected array $with = [];
+
+    /**
+     * @return string
+     */
+    protected function getModelClass(): string
+    {
+        return {{modelName}}::class;
+    }
+}

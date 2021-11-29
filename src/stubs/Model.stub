@@ -1,0 +1,13 @@
+<?php
+
+namespace {{typeNamespace}}{{pathNamespace}};
+
+use {{parentClass}};
+
+/**
+ * Class {{modelName}}
+ */
+class {{modelName}} extends Entity
+{
+    protected $guarded = [];
+}

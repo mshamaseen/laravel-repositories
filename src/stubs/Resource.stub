@@ -1,0 +1,23 @@
+<?php
+
+namespace {{typeNamespace}}{{pathNamespace}};
+
+use {{parentClass}};
+use {{RequestsNamespace}}{{pathNamespace}}\{{modelName}}Request;
+
+/**
+ * Class {{modelName}}Resource
+ */
+class {{modelName}}Resource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param {{modelName}}Request $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return parent::toArray($request);
+    }
+}

@@ -1,0 +1,23 @@
+<?php
+
+namespace {{typeNamespace}}{{pathNamespace}};
+
+use {{parentClass}};
+
+/**
+ * Class {{modelName}}Request
+ */
+class {{modelName}}Request extends Request
+{
+    /**
+     * Define all the global rules for this request here.
+     *
+     * @var array
+     */
+    protected array $rules = [
+
+    ];
+
+    // Write your methods using {lastPartOfRouteName}RouteRules(), or {HTTP Method}MethodRules syntax.
+    // For example, for route name "users.index", method indexRouteRules() will be triggered.
+}
