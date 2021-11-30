@@ -32,7 +32,7 @@ class {{modelName}}Controller extends Controller
      * @param {{modelName}}Request $request
      * @param {{modelName}}Resource $resource
      */
-    public function __construct({{modelName}}Repository $repository, {{modelName}}Request $request,{{modelName}}Resource $resource)
+    public function __construct({{modelName}}Repository $repository, {{modelName}}Request $request, {{modelName}}Resource $resource)
     {
         parent::__construct($repository, $request, $resource);
     }

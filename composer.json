@@ -18,10 +18,10 @@
     },
     "autoload": {
         "psr-4": {
+            "Shamaseen\\Repository\\Tests\\": "tests/",
             "Shamaseen\\Repository\\": "src/"
         }
     },
-
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
@@ -33,6 +33,8 @@
         "doctrine/dbal": ">2.8",
         "illuminate/database": ">5.7",
         "illuminate/routing": ">5.7",
-        "illuminate/validation": ">5.7"
+        "illuminate/validation": ">5.7",
+        "phpunit/phpunit": "^9.5",
+        "orchestra/testbench": "^6.0"
     }
 }

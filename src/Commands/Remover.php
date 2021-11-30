@@ -1,23 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Shamaseen
- * Date: 10/08/19
- * Time: 04:48 م
- */
 
 namespace Shamaseen\Repository\Commands;
 
 use FilesystemIterator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
 use Shamaseen\Generator\Ungenerator;
-use Shamaseen\Repository\Traits\PathsResolver;
+use Shamaseen\Repository\PathResolver;
 
 class Remover extends Command
 {
-    use PathsResolver;
 
     /**
      * The name and signature of the console command.
@@ -54,14 +46,16 @@ class Remover extends Command
      */
     protected string $modelName;
     private Ungenerator $ungenerator;
+    private PathResolver $pathResolver;
 
     /**
      * Create a new command instance.
      */
-    public function __construct(Ungenerator $ungenerator)
+    public function __construct(Ungenerator $ungenerator, PathResolver $pathResolver)
     {
         parent::__construct();
         $this->ungenerator = $ungenerator;
+        $this->pathResolver = $pathResolver;
     }
 
     /**
@@ -88,21 +82,24 @@ class Remover extends Command
             return false;
         }
 
+        // Paths
         $controller = Config::get('repository.controllers_path');
-        $model = Str::plural(Config::get('repository.model'));
-        $repository = Str::plural(Config::get('repository.repository'));
+        $model = Config::get('repository.models_path');
+        $repository = Config::get('repository.repositories_path');
         $request = Config::get('repository.requests_path');
+        $resource = Config::get('repository.json_resources_path');
 
         $this->remove('Controller', $controller);
-        $this->remove('Entity', $model);
+        $this->remove('Model', $model);
         $this->remove('Request', $request);
         $this->remove('Repository', $repository);
+        $this->remove('Resource', $resource);
         return true;
     }
 
     public function remove($type, $typePath): bool
     {
-        $fileToDelete = $typePath . "/" . $this->path . "/" . $this->modelName . $type . ".php";
+        $fileToDelete = $this->pathResolver->outputPath($type, $this->path, $this->modelName);
 
         if (is_file($fileToDelete)) {
             $this->ungenerator->output($fileToDelete);
