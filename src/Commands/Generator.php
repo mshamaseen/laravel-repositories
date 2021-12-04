@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Shamaseen\Generator\Generator as GeneratorService;
+use Shamaseen\Repository\Events\RepositoryFilesGenerated;
 use Shamaseen\Repository\PathResolver;
 
 /**
@@ -102,6 +103,8 @@ class Generator extends Command
         $this->generate('Request', $requestParent);
         $this->generate('Repository', $repositoryParent);
         $this->generate('Resource', $resourceParent);
+
+        RepositoryFilesGenerated::dispatch($this->path,$this->modelName);
 
         $this->dumpAutoload();
 

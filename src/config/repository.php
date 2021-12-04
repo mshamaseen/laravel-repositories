@@ -16,7 +16,7 @@ return [
     // Parent classes
     'controller_parent' => 'Shamaseen\Repository\Utility\Controller',
     'resource_parent' => 'Shamaseen\Repository\Utility\JsonResource',
-    'model_parent' => 'Shamaseen\Repository\Utility\Entity',
+    'model_parent' => 'Shamaseen\Repository\Utility\Model',
     'repository_parent' => 'Shamaseen\Repository\Utility\AbstractRepository',
     'request_parent' => 'Shamaseen\Repository\Utility\Request',
 
@@ -29,8 +29,15 @@ return [
 
     /*
      * Available options:
-     * simple {For simplePagination},
-     * countable {For paginate with page numbers and total count data}
+     * simple - For simplePagination,
+     * countable - For paginate with page numbers and total count data
      */
-    'defaultPagination' => 'countable'
+    'default_pagination' => 'countable',
+
+    /*
+     * Chose what kind of responses should be returned
+     * Available Options:
+     * api, web, both
+     */
+    'responses' => 'both'
 ];

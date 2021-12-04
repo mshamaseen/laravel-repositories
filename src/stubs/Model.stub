@@ -9,5 +9,8 @@ use {{parentClass}};
  */
 class {{modelName}} extends Entity
 {
-    protected $guarded = [];
+    /*
+    * Fill in your fillables here
+    */
+    protected $fillable = [];
 }

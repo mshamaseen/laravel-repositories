@@ -16,7 +16,7 @@ class {{modelName}}Resource extends JsonResource
      * @param {{modelName}}Request $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return parent::toArray($request);
     }

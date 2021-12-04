@@ -6,11 +6,11 @@ use FilesystemIterator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 use Shamaseen\Generator\Ungenerator;
+use Shamaseen\Repository\Events\RepositoryFilesRemoved;
 use Shamaseen\Repository\PathResolver;
 
 class Remover extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -94,6 +94,11 @@ class Remover extends Command
         $this->remove('Request', $request);
         $this->remove('Repository', $repository);
         $this->remove('Resource', $resource);
+
+        RepositoryFilesRemoved::dispatch($this->path,$this->modelName);
+
+        $this->dumpAutoload();
+
         return true;
     }
 
@@ -114,5 +119,10 @@ class Remover extends Command
         }
 
         return true;
+    }
+
+    private function dumpAutoload()
+    {
+        shell_exec('composer dump-autoload');
     }
 }

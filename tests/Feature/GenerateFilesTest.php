@@ -32,19 +32,23 @@ class GenerateFilesTest extends TestCase
         $this->pathResolver = $this->app->make(PathResolver::class);
     }
 
-    function test_command_generate()
+    function test_generate()
     {
         $this->artisan('make:repository Tests/Test');
 
-        $this->checkFiles();
-    }
-
-    private function checkFiles()
-    {
         foreach ($this->filesToGenerate as $type) {
             $outputPath = $this->pathResolver->outputPath($type,'Tests','Test');
-
             $this->assertFileExists($outputPath);
+        }
+    }
+
+    function test_ungenerate()
+    {
+        $this->artisan('remove:repository Tests/Test')->expectsConfirmation('This will delete Test files and folder, Do you want to continue ?','yes');
+
+        foreach ($this->filesToGenerate as $type) {
+            $outputPath = $this->pathResolver->outputPath($type,'Tests','Test');
+            $this->assertFileDoesNotExist($outputPath);
         }
     }
 }

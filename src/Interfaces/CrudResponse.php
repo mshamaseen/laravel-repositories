@@ -2,11 +2,15 @@
 
 namespace Shamaseen\Repository\Interfaces;
 
-interface CrudInterface
+use Illuminate\Database\Eloquent\Model;
+
+interface CrudResponse
 {
-    public function index();
-    public function show($entity);
+    public function index($paginate);
+    public function show(Model $entity);
     public function create();
-    public function store();
-    public function delete();
+    public function store(Model $entity);
+    public function edit(Model $entity);
+    public function update(Model $entity);
+    public function destroy(bool $isDestroyed);
 }

@@ -10,17 +10,17 @@ use Illuminate\Database\Query\Builder;
  *
  * @property array $searchable
  * @method static bool|null forceDelete()
- * @method static Builder|Entity whereId($value)
- * @method static Builder|Entity newModelQuery()
- * @method static Builder|Entity newQuery()
- * @method static Builder|Entity onlyTrashed()
- * @method static Builder|Entity query()
+ * @method static Builder|Model whereId($value)
+ * @method static Builder|Model newModelQuery()
+ * @method static Builder|Model newQuery()
+ * @method static Builder|Model onlyTrashed()
+ * @method static Builder|Model query()
  * @method static bool|null restore()
- * @method static Builder|Entity withTrashed()
- * @method static Builder|Entity withoutTrashed()
+ * @method static Builder|Model withTrashed()
+ * @method static Builder|Model withoutTrashed()
  * @mixin Eloquent
  */
-class Entity extends Eloquent
+class Model extends Eloquent
 {
     public array $searchable = [];
     protected $dates = [

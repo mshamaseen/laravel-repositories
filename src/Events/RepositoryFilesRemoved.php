@@ -5,7 +5,7 @@ namespace Shamaseen\Repository\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class RepositoryFilesGenerated
+class RepositoryFilesRemoved
 {
     use Dispatchable, SerializesModels;
 

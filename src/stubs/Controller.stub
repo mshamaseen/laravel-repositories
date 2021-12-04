@@ -11,6 +11,7 @@ use {{parentClass}};
  * Class {{modelName}}Controller
  * @package App\Http\Controllers{{path}}
  * @property-read {{modelName}}Repository $repository
+ * @property-read {{modelName}}Resource $resource
  */
 class {{modelName}}Controller extends Controller
 {
@@ -30,10 +31,9 @@ class {{modelName}}Controller extends Controller
      *
      * @param {{modelName}}Repository $repository
      * @param {{modelName}}Request $request
-     * @param {{modelName}}Resource $resource
      */
-    public function __construct({{modelName}}Repository $repository, {{modelName}}Request $request, {{modelName}}Resource $resource)
+    public function __construct({{modelName}}Repository $repository, {{modelName}}Request $request)
     {
-        parent::__construct($repository, $request, $resource);
+        parent::__construct($repository, $request, {{modelName}}Resource::class);
     }
 }

@@ -25,7 +25,7 @@ interface RepositoryInterface
      * @param array $data
      * @param int $entityId
      *
-     * @return Entity|Model|bool
+     * @return Model|Model|bool
      */
     public function update(int $entityId, array $data = []);
 
@@ -116,7 +116,7 @@ interface RepositoryInterface
     /**
      * @param array $data
      *
-     * @return Entity|Model
+     * @return Model|Model
      */
     public function create(array $data = []);
 
@@ -130,7 +130,7 @@ interface RepositoryInterface
     /**
      * @param array $data
      *
-     * @return Entity|Model
+     * @return Model|Model
      */
     public function createOrUpdate(array $data = []);
 

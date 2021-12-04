@@ -26,7 +26,9 @@ class RepositoryServiceProvider extends ServiceProvider
         //configs
         $this->publishes([
             __DIR__.'/config' => config_path('repository.php'),
+            __DIR__.'/lang/repository.php' => lang_path('repository.php'),
         ], 'repository');
+
 
         //if the configuration is not published then use the package one
         if (null === $this->app['config']->get('repository')) {

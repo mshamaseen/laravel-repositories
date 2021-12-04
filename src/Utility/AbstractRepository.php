@@ -31,7 +31,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     protected string $direction = 'desc';
 
-    protected Entity $model;
+    protected Model $model;
 
     private bool $trash = false;
 
@@ -68,7 +68,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @return \Illuminate\Database\Query\Builder|Entity
+     * @return \Illuminate\Database\Query\Builder|Model
      */
     public function builder()
     {
@@ -84,7 +84,7 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         $criteria = $this->order($criteria);
 
-        /** @var Entity $latest */
+        /** @var Model $latest */
         $latest = $this->model->with($this->with);
         if ('' != $this->order) {
             $latest->orderBy($this->order, $this->direction);
@@ -168,7 +168,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param int $entityId
      * @param array $data
      *
-     * @return bool|Collection|Model|Entity
+     * @return bool|Collection|Model|Model
      */
     public function update(int $entityId = 0, array $data = [])
     {
@@ -315,7 +315,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param $haystack
      * @param $needle
      *
-     * @return Entity[]|Model[]|Collection
+     * @return Model[]|Model[]|Collection
      */
     public function search($haystack, $needle)
     {
@@ -336,7 +336,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param array $data
      *
-     * @return Entity|Model
+     * @return Model|Model
      */
     public function create(array $data = [])
     {
@@ -380,7 +380,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function restore(int $entityId = 0): bool
     {
-        /** @var Entity|null $entity */
+        /** @var Model|null $entity */
         $entity = $this->model->withTrashed()
             ->whereId($entityId)
             ->first();
@@ -398,7 +398,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function forceDelete(int $entityId = 0): bool
     {
-        /** @var Entity|null $entity */
+        /** @var Model|null $entity */
         $entity = $this->model->withTrashed()
             ->whereId($entityId)
             ->first();

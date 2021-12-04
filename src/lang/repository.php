@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Mohammad Shamaseen
- * Date: 10/04/19
- * Time: 01:48.
- */
 
 return [
     'edit' => 'Edit',
@@ -16,5 +10,8 @@ return [
     'error' => 'An error occur, please try again later!',
     'not_found' => 'What you are looking for is not found!',
     'no_content' => 'No content to show!',
-    'list' => 'List'
+    'list' => 'List',
+    'created_successfully' => 'Entity was created Successfully',
+    'deleted_successfully' => 'Entity was deleted Successfully',
+    'modified_successfully' => 'Entity was modified Successfully',
 ];

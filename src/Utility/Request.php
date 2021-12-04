@@ -49,22 +49,26 @@ class Request extends FormRequest
         parent::failedValidation($validator);
     }
 
-    public function rules()
+    public function rules(): array
     {
         $rules = [] + $this->rules;
 
         $method = $this->method();
 
         if (method_exists($this, $method . "MethodRules")) {
-            $rules += $this->{$method . "MethodRules"};
+            $rules += $this->{$method . "MethodRules"}();
         }
 
-        $routeName = $this->route()->getName();
-        if ($routeName) {
-            $lastPart = last(explode(".", $routeName));
-            $methodName = $lastPart . "RouteRules";
-            if (method_exists($this, $methodName)) {
-                $rules += $this->{$methodName};
+        $route = $this->route();
+        // make sure that it is accessed by a route and not command or job
+        if ($route) {
+            $routeName = $route->getName();
+            if ($routeName) {
+                $lastPart = last(explode(".", $routeName));
+                $methodName = $lastPart . "RouteRules";
+                if (method_exists($this, $methodName)) {
+                    $rules += $this->{$methodName}();
+                }
             }
         }
 
