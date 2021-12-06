@@ -5,35 +5,32 @@ namespace {{typeNamespace}}{{pathNamespace}};
 use {{RepositoriesNamespace}}{{pathNamespace}}\{{modelName}}Repository;
 use {{RequestsNamespace}}{{pathNamespace}}\{{modelName}}Request;
 use {{ResourcesNamespace}}{{pathNamespace}}\{{modelName}}Resource;
-use {{parentClass}};
+use {{parentClass}} as Controller;
 
 /**
  * Class {{modelName}}Controller
- * @package App\Http\Controllers{{path}}
  * @property-read {{modelName}}Repository $repository
- * @property-read {{modelName}}Resource $resource
  */
 class {{modelName}}Controller extends Controller
 {
 
-    protected string $routeIndex = '{{lcModelName}}.index';
+    public string $routeIndex = '{{lcPluralModelName}}.index';
 
-    protected string $pageTitle = '{{modelName}}';
-    protected string $createRoute = '{{lcPluralModelName}}.create';
+    public string $pageTitle = '{{modelName}}';
+    public string $createRoute = '{{lcPluralModelName}}.create';
 
-    protected string $viewIndex = '{{lcPluralModelName}}.index';
-    protected string $viewCreate = '{{lcPluralModelName}}.create';
-    protected string $viewEdit = '{{lcPluralModelName}}.edit';
-    protected string $viewShow = '{{lcPluralModelName}}.show';
+    public string $viewIndex = '{{lcPluralModelName}}.index';
+    public string $viewCreate = '{{lcPluralModelName}}.create';
+    public string $viewEdit = '{{lcPluralModelName}}.edit';
+    public string $viewShow = '{{lcPluralModelName}}.show';
 
     /**
      * {{modelName}}Controller constructor.
      *
      * @param {{modelName}}Repository $repository
-     * @param {{modelName}}Request $request
      */
-    public function __construct({{modelName}}Repository $repository, {{modelName}}Request $request)
+    public function __construct({{modelName}}Repository $repository)
     {
-        parent::__construct($repository, $request, {{modelName}}Resource::class);
+        parent::__construct($repository, {{modelName}}Request::class, {{modelName}}Resource::class);
     }
 }

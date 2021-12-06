@@ -104,7 +104,7 @@ class Generator extends Command
         $this->generate('Repository', $repositoryParent);
         $this->generate('Resource', $resourceParent);
 
-        RepositoryFilesGenerated::dispatch($this->path,$this->modelName);
+        RepositoryFilesGenerated::dispatch($this->path, $this->modelName);
 
         $this->dumpAutoload();
 

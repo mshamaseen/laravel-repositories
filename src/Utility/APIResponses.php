@@ -18,6 +18,7 @@ class APIResponses implements CrudResponse
 
     public function index($paginate): JsonResponse
     {
+        /** @noinspection PhpUndefinedMethodInspection */
         $resource = $this->controller->resource::collection($paginate);
 
         $response = $resource->response();

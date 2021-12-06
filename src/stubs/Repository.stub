@@ -2,7 +2,7 @@
 namespace {{typeNamespace}}{{pathNamespace}};
 
 use {{ModelNamespace}}{{pathNamespace}}\{{modelName}};
-use {{parentClass}};
+use {{parentClass}} as AbstractRepository;
 
 /**
  * Class {{modelName}}Repository

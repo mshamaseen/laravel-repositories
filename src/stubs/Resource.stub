@@ -2,7 +2,7 @@
 
 namespace {{typeNamespace}}{{pathNamespace}};
 
-use {{parentClass}};
+use {{parentClass}} as JsonResource;
 use {{RequestsNamespace}}{{pathNamespace}}\{{modelName}}Request;
 
 /**

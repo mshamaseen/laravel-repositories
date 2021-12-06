@@ -2,12 +2,12 @@
 
 namespace {{typeNamespace}}{{pathNamespace}};
 
-use {{parentClass}};
+use {{parentClass}} as Model;
 
 /**
  * Class {{modelName}}
  */
-class {{modelName}} extends Entity
+class {{modelName}} extends Model
 {
     /*
     * Fill in your fillables here

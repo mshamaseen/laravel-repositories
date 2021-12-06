@@ -1,7 +1,8 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
 
 namespace Shamaseen\Repository\Utility;
 
+use App;
 use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -55,45 +56,61 @@ class Controller extends LaravelController
 
     public array $params = [];
 
-    /**
-     * @var string|null|JsonResource - is a JsonResource namespace
-     */
     public ?string $resource;
 
     public ResponseDispatcher $responseDispatcher;
+    private string $requestClass;
+    private ?string $resourceClass;
 
     /**
      * BaseController constructor.
      *
      * @param AbstractRepository $repository
-     * @param Request $request
+     * @param string $requestClass
      * @param string|null $resource
      */
-    public function __construct(AbstractRepository $repository, Request $request, string $resource = null)
+    public function __construct(AbstractRepository $repository, string $requestClass, string $resource = null)
     {
         $this->repository = $repository;
-        $this->request = $request;
         $this->breadcrumbs = new Collection();
-        $this->isAPI = $request->expectsJson();
-        $this->responseDispatcher = new ResponseDispatcher($this);
         $this->resource = $resource;
         $this->paginateType = $this->paginateType ?? config('repository.default_pagination');
-        $this->limit = min($request->get('limit', $this->limit), $this->maxLimit);
+        $this->requestClass = $requestClass;
+    }
+
+    /**
+     * Any data that depend on the request instance should be inside this callback,
+     * Request instance should be initialized after other middlewares.
+     *
+     * @param $method
+     * @param $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function callAction($method, $parameters)
+    {
+        $this->request = App::make($this->requestClass);
+
+        $this->isAPI = $this->request->expectsJson();
+        $this->limit = min($this->request->get('limit', $this->limit), $this->maxLimit);
 
         if ($this->allowTrashRequest) {
-            if ($request->get('with-trash', false)) {
-                $repository->withTrash();
+            if ($this->request->get('with-trash', false)) {
+                $this->repository->withTrash();
             }
 
-            if ($request->get('only-trash', false)) {
-                $repository->trash();
+            if ($this->request->get('only-trash', false)) {
+                $this->repository->trash();
             }
         }
 
-        $request->offsetUnset('only-trash');
-        $request->offsetUnset('with-trash');
-        $request->offsetUnset('limit');
+        $this->request->offsetUnset('only-trash');
+        $this->request->offsetUnset('with-trash');
+        $this->request->offsetUnset('limit');
+        $this->responseDispatcher = new ResponseDispatcher($this);
+
+        return parent::callAction($method, $parameters);
     }
+
 
     /**
      * Display a listing of the model.

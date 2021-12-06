@@ -8,12 +8,7 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\ValidationException;
-use Response;
-use Symfony\Component\HttpFoundation\Response as jsonResponse;
 
 /**
  * Class BaseRequests.
@@ -28,26 +23,6 @@ class Request extends FormRequest
     protected array $rules = [
 
     ];
-
-    /**
-     * @param Validator $validator
-     *
-     * @throws ValidationException
-     */
-    protected function failedValidation(Validator $validator)
-    {
-        if ($this->expectsJson()) {
-            $errors = (new ValidationException($validator))->errors();
-            throw new HttpResponseException(Response::json(
-                [
-                    'success' => false,
-                    'errors' => $errors
-                ],
-                jsonResponse::HTTP_UNPROCESSABLE_ENTITY
-            ));
-        }
-        parent::failedValidation($validator);
-    }
 
     public function rules(): array
     {
