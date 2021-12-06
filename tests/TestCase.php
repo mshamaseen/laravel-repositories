@@ -49,7 +49,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         // perform environment setup
     }
 
-    function makePathIfNotExist($path)
+    public function makePathIfNotExist($path)
     {
         if (!is_dir($path)) {
             mkdir($path, 775, true);
@@ -59,7 +59,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * Using `vendor:publish --tag="repository-stubs"` didn't work as the test config path is not set yet
      */
-    function publishStubs()
+    public function publishStubs()
     {
         $iterator = new FilesystemIterator(__DIR__."/../src/stubs");
         foreach ($iterator as $i) {
@@ -67,12 +67,12 @@ class TestCase extends \Orchestra\Testbench\TestCase
              * @var DirectoryIterator $i
              */
             if ($i->isFile()) {
-                copy($i->getPathname(),$this->configs['repository.stubs_path']."/".$i->getFilename());
+                copy($i->getPathname(), $this->configs['repository.stubs_path']."/".$i->getFilename());
             }
         }
     }
 
-    function alterConfig()
+    public function alterConfig()
     {
         foreach ($this->configs as $key => $value) {
             config()->set($key, $value);
