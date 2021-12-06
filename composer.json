@@ -25,6 +25,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
+        "php": "^7.4|8.*"
     },
     "require-dev": {
         "shamaseen/laravel-files-generator": "^0.3",
