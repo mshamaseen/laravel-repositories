@@ -133,11 +133,16 @@ class Generator extends Command
 
         $typeNamespace = $this->pathResolver->typeNamespace($type);
 
+        $lcModelName = Str::lower($this->modelName);
+        $lcPluralModelName = Str::plural($lcModelName);
+        $snackLcPluralModelName = Str::snake($this->modelName);
+
         $this->generator->stub($this->pathResolver->getStubPath($type))
             ->replace('{{parentClass}}', $parentClass) // was base
             ->replace('{{modelName}}', $this->modelName)
-            ->replace('{{lcModelName}}', Str::lower($this->modelName))
-            ->replace('{{lcPluralModelName}}', Str::plural(Str::lower($this->modelName)))
+            ->replace('{{lcModelName}}', $lcModelName)
+            ->replace('{{lcPluralModelName}}', $lcPluralModelName)
+            ->replace('{{snackLcPluralModelName}}', $snackLcPluralModelName)
             ->replace('{{typeNamespace}}', $typeNamespace) // was folder
             ->replace('{{pathNamespace}}', $pathNamespace) // was path
             ->replace('{{RequestsNamespace}}', $this->requestsNamespace)

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
@@ -6,8 +6,8 @@ use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Interface EloquentInterface.
@@ -25,7 +25,7 @@ interface RepositoryInterface
      * @param array $data
      * @param int $entityId
      *
-     * @return Model|Model|bool
+     * @return Model|bool
      */
     public function update(int $entityId, array $data = []);
 
@@ -84,9 +84,9 @@ interface RepositoryInterface
      * @param array $criteria
      * @param array $columns
      *
-     * @return LengthAwarePaginator
+     * @return Builder[]|Collection
      */
-    public function get(array $criteria = [], array $columns = []): LengthAwarePaginator;
+    public function get(array $criteria = [], array $columns = []);
 
     /**
      * @param string $name
@@ -116,9 +116,9 @@ interface RepositoryInterface
     /**
      * @param array $data
      *
-     * @return Model|Model
+     * @return Model
      */
-    public function create(array $data = []);
+    public function create(array $data = []): Model;
 
     /**
      * @param array $data
@@ -130,9 +130,9 @@ interface RepositoryInterface
     /**
      * @param array $data
      *
-     * @return Model|Model
+     * @return Model
      */
-    public function createOrUpdate(array $data = []);
+    public function createOrUpdate(array $data = []): Model;
 
     /**
      * Get entity name.

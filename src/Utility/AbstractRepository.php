@@ -1,10 +1,4 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: Hamza Alayed
- * Date: 11/29/18
- * Time: 9:38 AM.
- */
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
@@ -15,7 +9,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
@@ -159,7 +152,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param array $columns
      * @return Builder[]|Collection
      */
-    public function get(array $criteria = [], array $columns = ['*']): LengthAwarePaginator
+    public function get(array $criteria = [], array $columns = ['*'])
     {
         return $this->filter($criteria)->get($columns);
     }
@@ -168,7 +161,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param int $entityId
      * @param array $data
      *
-     * @return bool|Collection|Model|Model
+     * @return bool|Collection|Model
      */
     public function update(int $entityId = 0, array $data = [])
     {
@@ -315,7 +308,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param $haystack
      * @param $needle
      *
-     * @return Model[]|Model[]|Collection
+     * @return Model[]|Collection
      */
     public function search($haystack, $needle)
     {
@@ -336,9 +329,9 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param array $data
      *
-     * @return Model|Model
+     * @return Model
      */
-    public function create(array $data = [])
+    public function create(array $data = []): Model
     {
         return $this->model->create($data);
     }
