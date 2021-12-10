@@ -25,8 +25,8 @@ class RepositoryServiceProvider extends ServiceProvider
 
         //configs
         $this->publishes([
-            __DIR__.'/config' => config_path('repository.php'),
-            __DIR__.'/lang/repository.php' => lang_path('repository.php'),
+            __DIR__.'/config/repository.php' => config_path('repository.php'),
+            __DIR__.'/lang/repository.php' => lang_path('en/repository.php'),
         ], 'repository');
 
 

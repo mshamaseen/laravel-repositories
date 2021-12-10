@@ -119,11 +119,17 @@ class Generator extends Command
      */
     protected function generate(string $type, string $parentClass = ''): bool
     {
+        $outputPath = $this->pathResolver->outputPath($type, $this->path, $this->modelName);
+
+        if ($realpath = realpath($outputPath)) {
+            if (!$this->confirm('File '.$realpath.' is exist, do you want to overwrite it?')) {
+                return false;
+            }
+        }
+
         $pathNamespace = $this->path ?
             '\\' . $this->pathResolver->forwardSlashesToBackSlashes($this->path)
             : '';
-
-        $outputPath = $this->pathResolver->outputPath($type, $this->path, $this->modelName);
 
         $typeNamespace = $this->pathResolver->typeNamespace($type);
 
