@@ -15,6 +15,14 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class Request extends FormRequest
 {
+    public AbstractRepository $repository;
+
+    public function __construct(AbstractRepository $repository, array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
+    {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+        $this->repository = $repository;
+    }
+
     /**
      * Define all the global rules for this request here.
      *
@@ -37,11 +45,14 @@ class Request extends FormRequest
         $route = $this->route();
         // make sure that it is accessed by a route and not command or job
         if ($route) {
-            $routeName = $route->getName();
+            $routeName = $route->action['uses'];
             if ($routeName) {
-                $lastPart = last(explode(".", $routeName));
-                $methodName = $lastPart . "RouteRules";
-                if (method_exists($this, $methodName)) {
+                $lastPart = last(explode("@", $routeName));
+                $methodName = $lastPart;
+
+                $reflection = new \ReflectionClass($this);
+                // make sure the method is exists in the user defined request
+                if ($reflection->hasMethod($methodName) && $reflection->getMethod($methodName)->class === $reflection->getName()) {
                     $rules += $this->{$methodName}();
                 }
             }

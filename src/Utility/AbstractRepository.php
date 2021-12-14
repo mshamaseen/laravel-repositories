@@ -10,6 +10,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Class Database.
@@ -208,6 +210,35 @@ abstract class AbstractRepository implements RepositoryInterface
     public function pluck(string $name = 'name', string $entityId = 'id', array $criteria = []): array
     {
         return $this->filter($criteria)->pluck($name, $entityId)->toArray();
+    }
+
+    /**
+     * Return the route key of the model id
+     *
+     * @throws ReflectionException
+     * @return string
+     */
+    public function getRouteParameterIdentifier(): string
+    {
+        $reflect = new ReflectionClass($this->model);
+        return \Str::lower($reflect->getShortName());
+    }
+
+    /**
+     * Return the model instance using the route ID.
+     * the id key in the route should match the model name, e.g. for User model the route parameter key should be user
+     *
+     * @throws ReflectionException
+     */
+    public function routeModel()
+    {
+        $modelID = \Request::route()->parameter($this->getRouteParameterIdentifier());
+
+        if ($modelID === null) {
+            return null;
+        }
+
+        return $this->findOrFail($modelID);
     }
 
     /**

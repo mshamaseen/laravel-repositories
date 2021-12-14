@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Routing\Controller as LaravelController;
+use Symfony\Component\HttpFoundation\Response;
 use URL;
 
 /**
@@ -84,11 +85,11 @@ class Controller extends LaravelController
      *
      * @param $method
      * @param $parameters
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function callAction($method, $parameters)
     {
-        $this->request = App::make($this->requestClass);
+        $this->request = App::make($this->requestClass, ['repository' => $this->repository]);
 
         $this->isAPI = $this->request->expectsJson();
         $this->limit = min($this->request->get('limit', $this->limit), $this->maxLimit);
