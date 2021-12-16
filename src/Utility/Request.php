@@ -9,6 +9,7 @@
 namespace Shamaseen\Repository\Utility;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 /**
  * Class BaseRequests.
@@ -38,8 +39,10 @@ class Request extends FormRequest
 
         $method = $this->method();
 
-        if (method_exists($this, $method . "MethodRules")) {
-            $rules += $this->{$method . "MethodRules"}();
+        $httpValidatorName = 'Http'.ucfirst(Str::lower($method)).'Rules';
+
+        if (method_exists($this, $httpValidatorName)) {
+            $rules += $this->{$httpValidatorName}();
         }
 
         $route = $this->route();
@@ -48,12 +51,12 @@ class Request extends FormRequest
             $routeName = $route->action['uses'];
             if ($routeName) {
                 $lastPart = last(explode("@", $routeName));
-                $methodName = $lastPart;
+                $validatorName = $lastPart."Rules";
 
                 $reflection = new \ReflectionClass($this);
                 // make sure the method is exists in the user defined request
-                if ($reflection->hasMethod($methodName) && $reflection->getMethod($methodName)->class === $reflection->getName()) {
-                    $rules += $this->{$methodName}();
+                if ($reflection->hasMethod($validatorName) && $reflection->getMethod($validatorName)->class === $reflection->getName()) {
+                    $rules += $this->{$validatorName}();
                 }
             }
         }

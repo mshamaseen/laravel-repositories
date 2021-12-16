@@ -165,7 +165,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return bool|Collection|Model
      */
-    public function update(int $entityId = 0, array $data = [])
+    public function update(int $entityId, array $data = [])
     {
         $item = $this->model->findOrFail($entityId);
 
