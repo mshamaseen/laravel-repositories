@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
@@ -26,10 +26,6 @@ class APIResponses implements CrudResponse
 
         if ($paginate->hasMorePages()) {
             $code = Response::HTTP_PARTIAL_CONTENT;
-        }
-
-        if ($paginate->isEmpty()) {
-            $code = Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE;
         }
 
         return $response->setStatusCode($code);
