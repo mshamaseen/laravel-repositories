@@ -70,7 +70,7 @@ tools:
             - vendor
 
     # Runs Scrutinizer's PHP Analyzer Tool
-    phpphp_analyzer:
+    php_analyzer:
         enabled:              true
         filter:
             excluded_paths:
