@@ -1,0 +1,103 @@
+<?php
+
+namespace Shamaseen\Repository\Utility;
+
+use Illuminate\Database\Eloquent\Builder;
+
+trait Criteriable
+{
+    protected ?array $searchables = null;
+    protected ?array $filterable = null;
+
+    public function scopeFilter($query, array $criteria): self
+    {
+        foreach ($this->getFilterables() as $method => $columns) {
+            // if this is associative then it is a relation
+            if (gettype($method) === "string") {
+                if (method_exists($this, $method) && array_key_exists($method, $criteria)) {
+                    $query->whereHas($method, function ($query) use ($criteria, $columns, $method) {
+                        /* @var $query Builder */
+                        $query->where(function ($query2) use ($criteria, $columns, $method) {
+                            /* @var $query2 Builder */
+                            foreach ((array)$columns as $column) {
+                                $query2->where($column, $criteria[$method]);
+                            }
+                        });
+                    });
+                }
+            } elseif (array_key_exists($columns, $criteria)) {
+                $query->where($columns, $criteria);
+            }
+        }
+
+        return $query;
+    }
+
+    public function scopeSearch($query, array $criteria): self
+    {
+        if (isset($criteria['search'])) {
+            $query->where(function ($q) use ($criteria) {
+                /**
+                 * @var Builder $q
+                 */
+                foreach ($this->getSearchables() as $method => $columns) {
+                    if (method_exists($this, $method)) {
+                        $q->orWhereHas($method, function ($query) use ($criteria, $columns) {
+                            /* @var $query Builder */
+                            $query->where(function ($query2) use ($criteria, $columns) {
+                                /* @var $query2 Builder */
+                                foreach ((array)$columns as $column) {
+                                    $query2->orWhere($column, 'like', '%' . $criteria['search'] . '%');
+                                }
+                            });
+                        });
+                    } else {
+                        $q->orWhere($columns, 'like', '%' . $criteria['search'] . '%');
+                    }
+                }
+            });
+        }
+
+        return $query;
+    }
+
+    /**
+     * By default, all fillables and not hidden are searchables, if you want to override that explicitly set an array of searchables.
+     * For a relation this is the syntax [ relationName => [columns in the relation] ]
+     * @return array
+     */
+    public function getSearchables(): array
+    {
+        if ($this->searchables !== null) {
+            return $this->searchables;
+        }
+
+        return array_diff($this->getFillable(), $this->getHidden());
+    }
+
+    public function setSearchables($searchables): self
+    {
+        $this->searchables = $searchables;
+        return $this;
+    }
+
+    /**
+     * By default, all fillables and not hidden are filterables, if you want to override that explicitly set an array of searchables.
+     * For a relation this is the syntax [ relationName => [columns in the relation] ]
+     * @return array
+     */
+    public function getFilterables(): array
+    {
+        if ($this->searchables !== null) {
+            return $this->searchables;
+        }
+
+        return array_diff($this->getFillable(), $this->getHidden());
+    }
+
+    public function setFilterables($searchables): self
+    {
+        $this->searchables = $searchables;
+        return $this;
+    }
+}

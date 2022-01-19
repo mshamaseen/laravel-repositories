@@ -1,28 +1,29 @@
 <?php
 
-namespace Shamaseen\Repository\Utility;
+namespace Shamaseen\Repository\Utility\Models;
 
 use Eloquent;
-use Illuminate\Database\Query\Builder;
+use \Illuminate\Database\Eloquent\Builder;
 
 /**
  * App\Entities\BaseEntity.
  *
  * @property array $searchable
  * @method static bool|null forceDelete()
- * @method static Builder|Model whereId($value)
- * @method static Builder|Model newModelQuery()
- * @method static Builder|Model newQuery()
- * @method static Builder|Model onlyTrashed()
- * @method static Builder|Model query()
+ * @method static Builder whereId($value)
+ * @method static Builder newModelQuery()
+ * @method static Builder newQuery()
+ * @method static Builder onlyTrashed()
+ * @method static Builder query()
  * @method static bool|null restore()
- * @method static Builder|Model withTrashed()
- * @method static Builder|Model withoutTrashed()
+ * @method static Builder withTrashed()
+ * @method static Builder withoutTrashed()
  * @mixin Eloquent
  */
 class Model extends Eloquent
 {
-    public array $searchable = [];
+    use Criteriable;
+
     protected $dates = [
         'created_at',
         'updated_at',
