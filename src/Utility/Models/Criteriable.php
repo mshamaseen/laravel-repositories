@@ -1,6 +1,6 @@
 <?php
 
-namespace Shamaseen\Repository\Utility;
+namespace Shamaseen\Repository\Utility\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 
@@ -9,7 +9,7 @@ trait Criteriable
     protected ?array $searchables = null;
     protected ?array $filterable = null;
 
-    public function scopeFilter($query, array $criteria): self
+    public function scopeFilterByCriteria($query, array $criteria): Builder
     {
         foreach ($this->getFilterables() as $method => $columns) {
             // if this is associative then it is a relation
@@ -33,7 +33,7 @@ trait Criteriable
         return $query;
     }
 
-    public function scopeSearch($query, array $criteria): self
+    public function scopeSearchByCriteria($query, array $criteria): Builder
     {
         if (isset($criteria['search'])) {
             $query->where(function ($q) use ($criteria) {
@@ -56,6 +56,15 @@ trait Criteriable
                     }
                 }
             });
+        }
+
+        return $query;
+    }
+
+    public function scopeOrderByCriteria($query, array $criteria): Builder
+    {
+        if (isset($criteria['order'])) {
+            $query->orderBy($criteria['order'], $criteria['direction'] ?? 'desc');
         }
 
         return $query;

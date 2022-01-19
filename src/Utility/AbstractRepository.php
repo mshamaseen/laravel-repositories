@@ -1,49 +1,37 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
 use Exception;
 use Illuminate\Container\Container as App;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use ReflectionClass;
-use ReflectionException;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 /**
  * Class Database.
  */
 abstract class AbstractRepository implements RepositoryInterface
 {
-    protected array $with = [];
-
     protected App $app;
+
+    protected Model $model;
 
     protected ?string $order = null;
 
     protected string $direction = 'desc';
 
-    protected Model $model;
+    protected array $with = [];
 
-    private bool $trash = false;
+    private array $scopes = [];
 
-    private bool $withTrash = false;
-
-    private bool $allowCaching = true;
-
-    private array $cache = [];
-
-    /**
-     * @param App $app
-     * @throws BindingResolutionException
-     */
-    public function __construct(App $app)
+    public function __construct()
     {
-        $this->app = $app;
-        $this->model = $this->app->make($this->getModelClass());
+        $this->model = \App::make($this->getModelClass());
     }
 
     /**
@@ -55,97 +43,81 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param int $limit
      * @param array $criteria
      *
-     * @return Paginator
+     * @return LengthAwarePaginator
      */
-    public function simplePaginate(int $limit = 10, array $criteria = []): Paginator
+    public function paginate(int $limit = 10, array $criteria = []): LengthAwarePaginator
     {
-        return $this->filter($criteria)->simplePaginate($limit);
-    }
+        $this->injectDefaultCriteria($criteria);
 
-    /**
-     * @return \Illuminate\Database\Query\Builder|Model
-     */
-    public function builder()
-    {
-        return $this->model->query();
-    }
-
-    /**
-     * @param array $criteria
-     *
-     * @return Builder
-     */
-    public function filter(array $criteria = []): Builder
-    {
-        $criteria = $this->order($criteria);
-
-        /** @var Model $latest */
-        $latest = $this->model->with($this->with);
-        if ('' != $this->order) {
-            $latest->orderBy($this->order, $this->direction);
-        }
-
-        if (isset($criteria['search'])) {
-            foreach ($this->model->searchable as $method => $columns) {
-                if (method_exists($this->model, $method)) {
-                    $latest->orWhereHas($method, function ($query) use ($criteria, $columns) {
-                        /* @var $query Builder */
-                        $query->where(function ($query2) use ($criteria, $columns) {
-                            /* @var $query2 Builder */
-                            foreach ((array)$columns as $column) {
-                                $query2->orWhere($column, 'like', '%' . $criteria['search'] . '%');
-                            }
-                        });
-                    });
-                } else {
-                    $latest->orWhere($columns, 'like', '%' . $criteria['search'] . '%');
-                }
-            }
-        }
-        unset($criteria['search']);
-
-        if ($this->trash) {
-            $latest->onlyTrashed();
-        }
-        if ($this->withTrash) {
-            $latest->withTrashed();
-        }
-
-        return $latest->where($criteria);
-    }
-
-    /**
-     * prepare order for query.
-     *
-     * @param array $criteria
-     *
-     * @return array
-     */
-    private function order(array $criteria = []): array
-    {
-        if (isset($criteria['order'])) {
-            $this->order = $criteria['order'];
-            unset($criteria['order']);
-        }
-
-        if (isset($criteria['direction'])) {
-            $this->direction = $criteria['direction'];
-            unset($criteria['direction']);
-        }
-        unset($criteria['page']);
-
-        return $criteria;
+        return $this->getNewBuilderWithScope()
+            ->with($this->with)
+            ->orderByCriteria($criteria)
+            ->searchByCriteria($criteria)
+            ->filterByCriteria($criteria)
+            ->paginate($limit);
     }
 
     /**
      * @param int $limit
      * @param array $criteria
      *
-     * @return LengthAwarePaginator
+     * @return Paginator
      */
-    public function paginate(int $limit = 10, array $criteria = []): LengthAwarePaginator
+    public function simplePaginate(int $limit = 10, array $criteria = []): Paginator
     {
-        return $this->filter($criteria)->paginate($limit);
+        return $this->getNewBuilderWithScope()
+            ->with($this->with)
+            ->orderByCriteria($criteria)
+            ->searchByCriteria($criteria)
+            ->filterByCriteria($criteria)
+            ->simplePaginate($limit);
+    }
+
+    /**
+     * @param int $id
+     * @param array $columns
+     *
+     * @return Model|null
+     */
+    public function findOrFail(int $id, array $columns = ['*']): ?EloquentModel
+    {
+        return $this->getNewBuilderWithScope()
+            ->with($this->with)
+            ->findOrFail($id, $columns);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return EloquentModel|null
+     */
+    public function create(array $data = []): ?EloquentModel
+    {
+        return $this->getNewBuilderWithScope()->create($data);
+    }
+
+    /**
+     *
+     * @param int $id
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function update(int $id, array $data = []): bool
+    {
+        return $this->getNewBuilderWithScope()->where('id', $id)->update($data);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return bool
+     * @throws Exception
+     *
+     */
+    public function delete(int $id = 0): bool
+    {
+        return $this->getNewBuilderWithScope()->where('id', $id)->delete();
     }
 
     /**
@@ -154,300 +126,77 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param array $columns
      * @return Builder[]|Collection
      */
-    public function get(array $criteria = [], array $columns = ['*'])
+    public function get(array $criteria = [], array $columns = ['*']): Collection|array
     {
-        return $this->filter($criteria)->get($columns);
+        return $this->getNewBuilderWithScope()
+            ->with($this->with)
+            ->orderByCriteria($criteria)
+            ->searchByCriteria($criteria)
+            ->filterByCriteria($criteria)
+            ->get($columns);
+    }
+
+    public function find(int $id, array $columns = ['*']): ?EloquentModel
+    {
+        return $this->getNewBuilderWithScope()
+            ->with($this->with)
+            ->find($id, $columns);
     }
 
     /**
-     * @param int $entityId
-     * @param array $data
-     *
-     * @return bool|Collection|Model
-     */
-    public function update(int $entityId, array $data = [])
-    {
-        $item = $this->model->findOrFail($entityId);
-
-        if ($item->update($data)) {
-            return $item;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param int $entityId
-     *
-     * @return bool
-     * @throws Exception
-     *
-     */
-    public function delete(int $entityId = 0): bool
-    {
-        $item = $this->model->findOrFail($entityId);
-
-        return $item->delete();
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return bool
-     */
-    public function insert(array $data = []): bool
-    {
-        return $this->model->insert($data);
-    }
-
-    /**
-     * @param string $name
-     * @param string $entityId
      * @param array $criteria
-     *
-     * @return array
-     */
-    public function pluck(string $name = 'name', string $entityId = 'id', array $criteria = []): array
-    {
-        return $this->filter($criteria)->pluck($name, $entityId)->toArray();
-    }
-
-    /**
-     * Return the route key of the model id
-     *
-     * @throws ReflectionException
-     * @return string
-     */
-    public function getRouteParameterIdentifier(): string
-    {
-        $reflect = new ReflectionClass($this->model);
-        return \Str::lower($reflect->getShortName());
-    }
-
-    /**
-     * Return the model instance using the route ID.
-     * the id key in the route should match the model name, e.g. for User model the route parameter key should be user
-     *
-     * @throws ReflectionException
-     */
-    public function routeModel()
-    {
-        $modelID = \Request::route()->parameter($this->getRouteParameterIdentifier());
-
-        if ($modelID === null) {
-            return null;
-        }
-
-        return $this->findOrFail($modelID);
-    }
-
-    /**
-     * @param int $entityId
      * @param array $columns
      *
      * @return Model|null
      */
-    public function find(int $entityId = 0, array $columns = ['*']): ?Model
+    public function first(array $criteria = [], array $columns = ['*']): ?Model
     {
-        if ($this->allowCaching) {
-            if (isset($this->cache[$entityId])) {
-                return $this->cache[$entityId];
-            }
-        }
-
-        $entity = $this->model->with($this->with)->find($entityId, $columns);
-
-        if ($this->allowCaching) {
-            $this->cache[$entityId] = $entity;
-        }
-
-        return $entity;
+        return $this->getNewBuilderWithScope()
+            ->with($this->with)
+            ->orderByCriteria($criteria)
+            ->searchByCriteria($criteria)
+            ->filterByCriteria($criteria)
+            ->first($columns);
     }
 
     /**
-     * @param $entityId
-     * @param array $columns
-     *
-     * @return Model|Collection|static|static[]
-     * @throws ModelNotFoundException
-     *
-     */
-    public function findOrFail($entityId = 0, array $columns = ['*'])
-    {
-        if ($this->allowCaching) {
-            if (isset($this->cache[$entityId])) {
-                return $this->cache[$entityId];
-            }
-        }
-
-        $entity = $this->model->with($this->with)->findOrFail($entityId, $columns);
-
-        if ($this->allowCaching) {
-            $this->cache[$entityId] = $entity;
-        }
-
-        return $entity;
-    }
-
-    /**
-     * @param array $filter
-     * @param array $columns
-     *
-     * @return Model|null|object
-     */
-    public function first(array $filter = [], array $columns = ['*'])
-    {
-        if ($this->allowCaching) {
-            if (isset($this->cache['first'])) {
-                return $this->cache['first'];
-            }
-        }
-
-        $entity = $this->filter($filter)->with($this->with)->select($columns)->first();
-
-        if ($this->allowCaching) {
-            $this->cache['first'] = $entity;
-        }
-
-        return $entity;
-    }
-
-    /**
-     * @param array $filter
-     * @param array $columns
-     *
-     * @return Model|null|object
-     */
-    public function last(array $filter = [], array $columns = ['*'])
-    {
-        if ($this->allowCaching) {
-            if (isset($this->cache['last'])) {
-                return $this->cache['last'];
-            }
-        }
-
-        $entity = $this->filter($filter)->with($this->with)->select($columns)->orderBy('id', 'desc')->first();
-
-        if ($this->allowCaching) {
-            $this->cache['last'] = $entity;
-        }
-
-        return $entity;
-    }
-
-    /**
-     * @param $haystack
-     * @param $needle
-     *
-     * @return Model[]|Collection
-     */
-    public function search($haystack, $needle)
-    {
-        return $this->model->where($haystack, 'like', $needle)->get();
-    }
-
-    /**
+     * @param string $key
      * @param array $criteria
      * @param array $columns
      *
-     * @return Model|null|object
+     * @return Model|null
      */
-    public function findBy(array $criteria = [], array $columns = ['*'])
+    public function last(string $key = 'id', array $criteria = [], array $columns = ['*']): ?Model
     {
-        return $this->model->with($this->with)->select($columns)->where($criteria)->first();
+        return $this->getNewBuilderWithScope()
+            ->with($this->with)
+            ->searchByCriteria($criteria)
+            ->filterByCriteria($criteria)
+            ->orderBy($key, 'desc')
+            ->first($columns);
     }
 
-    /**
-     * @param array $data
-     *
-     * @return Model
-     */
-    public function create(array $data = []): Model
+
+    public function injectDefaultCriteria(&$criteria)
     {
-        return $this->model->create($data);
+        $criteria['order'] = $criteria['order'] ?? $this->order;
+        $criteria['direction'] = $criteria['direction'] ?? $this->direction;
     }
 
-    /**
-     * @param array $data
-     *
-     * @return Model
-     */
-    public function createOrUpdate(array $data = []): Model
+    public function scope(callable $callable): static
     {
-        return $this->model->updateOrCreate($data);
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return Model
-     */
-    public function createOrFirst(array $data = []): Model
-    {
-        return $this->model->firstOrCreate($data);
-    }
-
-    /**
-     * Get entity name.
-     *
-     * @return string
-     */
-    public function entityName(): string
-    {
-        return $this->getModelClass();
-    }
-
-    /**
-     * @param int $entityId
-     *
-     * @return bool
-     */
-    public function restore(int $entityId = 0): bool
-    {
-        /** @var Model|null $entity */
-        $entity = $this->model->withTrashed()
-            ->whereId($entityId)
-            ->first();
-        if ($entity) {
-            return $entity->restore() ?? false;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param int $entityId
-     *
-     * @return bool
-     */
-    public function forceDelete(int $entityId = 0): bool
-    {
-        /** @var Model|null $entity */
-        $entity = $this->model->withTrashed()
-            ->whereId($entityId)
-            ->first();
-        if ($entity) {
-            return $entity->forceDelete() ?? false;
-        }
-
-        return false;
-    }
-
-    public function trash()
-    {
-        $this->trash = true;
-        $this->withTrash = false;
-    }
-
-    public function withTrash()
-    {
-        $this->trash = false;
-        $this->withTrash = true;
-    }
-
-    public function disableCaching(): AbstractRepository
-    {
-        $this->allowCaching = false;
+        $this->scopes[] = $callable;
         return $this;
+    }
+
+    private function getNewBuilderWithScope(): Builder
+    {
+        $newQuery = $this->model->newQuery();
+
+        foreach ($this->scopes as $scope) {
+            $scope($newQuery);
+        }
+
+        return $newQuery;
     }
 }

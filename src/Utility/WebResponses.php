@@ -24,7 +24,7 @@ class WebResponses implements CrudResponse
         View::share('pageTitle', __('repository.list').' ' . $this->controller->pageTitle . ' | ' . Config::get('app.name'));
 
         return view($this->controller->viewIndex, $this->controller->params)
-            ->with('entities',$paginate)
+            ->with('entities', $paginate)
             ->with('createRoute', $this->controller->createRoute)
             ->with('filters', $this->controller->request->all());
     }
@@ -59,7 +59,7 @@ class WebResponses implements CrudResponse
     public function update(Model $entity): RedirectResponse
     {
         return Redirect::to($this->controller->resolveRoute($this->controller->routeIndex))
-            ->with('message',__('repository.modified_successfully'));
+            ->with('message', __('repository.modified_successfully'));
     }
 
     public function destroy(bool $isDestroyed): RedirectResponse

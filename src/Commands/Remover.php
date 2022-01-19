@@ -16,7 +16,7 @@ class Remover extends Command
      *
      * @var string
      */
-    protected $signature = 'remove:repository
+    protected $signature = 'ungenerate:repository
     {name : Class (singular) for example User} {--only-view}';
 
     /**

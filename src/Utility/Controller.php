@@ -100,7 +100,7 @@ class Controller extends LaravelController
             }
 
             if ($this->request->get('only-trash', false)) {
-                $this->repository->trash();
+                $this->repository->onlyTrash();
             }
         }
 

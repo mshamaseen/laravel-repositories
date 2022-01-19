@@ -20,7 +20,7 @@ class Generator extends Command
      *
      * @var string
      */
-    protected $signature = 'make:repository
+    protected $signature = 'generate:repository
     {name : Class (singular) for example User}';
 
     /**
