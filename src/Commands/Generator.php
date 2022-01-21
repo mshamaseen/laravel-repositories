@@ -47,7 +47,7 @@ class Generator extends Command
      * Execute the console command.
      *
      */
-    public function handle()
+    public function handle(): int
     {
         $paths = preg_split(' ([/\\\]) ', $this->argument('name'));
 
@@ -66,7 +66,7 @@ class Generator extends Command
         return $this->makeRepositoryPatternFiles();
     }
 
-    public function makeRepositoryPatternFiles(): bool
+    public function makeRepositoryPatternFiles(): int
     {
         // Parent Classes
         $modelParent = Config::get('repository.model_parent');

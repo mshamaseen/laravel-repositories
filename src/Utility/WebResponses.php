@@ -2,6 +2,8 @@
 
 namespace Shamaseen\Repository\Utility;
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Config;
@@ -19,7 +21,7 @@ class WebResponses implements CrudResponse
         View::share('breadcrumbs', $controller->breadcrumbs);
     }
 
-    public function index($paginate)
+    public function index($paginate): \Illuminate\Contracts\View\View|Factory|Application
     {
         View::share('pageTitle', __('repository.list').' ' . $this->controller->pageTitle . ' | ' . Config::get('app.name'));
 
@@ -29,7 +31,7 @@ class WebResponses implements CrudResponse
             ->with('filters', $this->controller->request->all());
     }
 
-    public function show($entity)
+    public function show($entity): \Illuminate\Contracts\View\View|Factory|Application
     {
         View::share('pageTitle', 'View ' . $this->controller->pageTitle . ' | ' . Config::get('app.name'));
 
@@ -37,7 +39,7 @@ class WebResponses implements CrudResponse
             ->with('entity', $entity);
     }
 
-    public function create()
+    public function create(): \Illuminate\Contracts\View\View|Factory|Application
     {
         View::share('pageTitle', 'Create ' . $this->controller->pageTitle . ' | ' . Config::get('app.name'));
 
@@ -50,21 +52,23 @@ class WebResponses implements CrudResponse
             ->with('message', __('repository.created_successfully'));
     }
 
-    public function edit(Model $entity)
+    public function edit(Model $entity): \Illuminate\Contracts\View\View|Factory|Application
     {
         return view($this->controller->viewEdit, $this->controller->params)
             ->with('entity', $entity);
     }
 
-    public function update(Model $entity): RedirectResponse
+    public function update(int $updatedCount): RedirectResponse
     {
         return Redirect::to($this->controller->resolveRoute($this->controller->routeIndex))
-            ->with('message', __('repository.modified_successfully'));
+            ->with('message', __('repository.modified_successfully'))
+            ->with('updatedCount', $updatedCount);
     }
 
-    public function destroy(bool $isDestroyed): RedirectResponse
+    public function destroy(int $destroyedCount): RedirectResponse
     {
         return Redirect::to($this->controller->resolveRoute($this->controller->routeIndex))
-            ->with('message', __('repository.deleted_successfully'));
+            ->with('message', __('repository.deleted_successfully'))
+            ->with('destroyedCount', $destroyedCount);
     }
 }

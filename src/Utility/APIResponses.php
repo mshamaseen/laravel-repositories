@@ -2,8 +2,9 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Shamaseen\Repository\Interfaces\CrudResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,7 +19,10 @@ class APIResponses implements CrudResponse
 
     public function index($paginate): JsonResponse
     {
-        /** @noinspection PhpUndefinedMethodInspection */
+        /**
+         * @noinspection PhpUndefinedMethodInspection
+         * @var AnonymousResourceCollection $resource
+         */
         $resource = $this->controller->resource::collection($paginate);
 
         $response = $resource->response();
@@ -28,19 +32,23 @@ class APIResponses implements CrudResponse
             $code = Response::HTTP_PARTIAL_CONTENT;
         }
 
+        $resource->additional = $this->controller->params;
+
         return $response->setStatusCode($code);
     }
 
     /**
-     * @param Model $entity
+     * @param EloquentModel $entity
      * @return JsonResponse
      */
-    public function show(Model $entity): JsonResponse
+    public function show(EloquentModel $entity): JsonResponse
     {
         /**
          * @var $resource JsonResource
          */
         $resource = new $this->controller->resource($entity);
+        $resource->additional = $this->controller->params;
+
         return $resource->response()->setStatusCode(Response::HTTP_OK);
     }
 
@@ -49,55 +57,55 @@ class APIResponses implements CrudResponse
         return response()->json(
             [
                 'message' => __('repository.no_content'),
-                'data' => []
+                'data' => $this->controller->params
             ],
             Response::HTTP_NO_CONTENT
         );
     }
 
-    public function store(Model $entity): JsonResponse
+    public function store(EloquentModel $entity): JsonResponse
     {
         /**
          * @var $resource JsonResource
          */
         $resource = new $this->controller->resource($entity);
+
         return $resource
             ->additional([
-                'message' => __('repository.created_successfully')
+                'message' => __('repository.created_successfully'),
+                ...$this->controller->params
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    public function edit(Model $entity): JsonResponse
+    public function edit(EloquentModel $entity): JsonResponse
     {
         return response()->json(
             [
                 'message' => __('repository.no_content'),
-                'data' => []
+                'data' => $this->controller->params
             ],
             Response::HTTP_NO_CONTENT
         );
     }
 
-    public function update(Model $entity): JsonResponse
+    public function update(int $updatedCount): JsonResponse
     {
-        /**
-         * @var $resource JsonResource
-         */
-        $resource = new $this->controller->resource($entity);
-        return $resource
-            ->additional([
-                'message' => __('repository.modified_successfully')
-            ])
-            ->response()
-            ->setStatusCode(Response::HTTP_OK);
+        return response()->json(
+            [
+                'message' => __('repository.modified_successfully'),
+                'data' => $this->controller->params
+            ],
+            Response::HTTP_OK
+        );
     }
 
-    public function destroy(bool $isDestroyed): JsonResponse
+    public function destroy(int $destroyedCount): JsonResponse
     {
         return response()->json([
-            'message' => __('repository.deleted_successfully')
+            'message' => __('repository.deleted_successfully'),
+            'data' => $this->controller->params
         ], Response::HTTP_OK);
     }
 }

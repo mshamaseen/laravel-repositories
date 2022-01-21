@@ -101,9 +101,9 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param int $id
      * @param array $data
      *
-     * @return bool
+     * @return int
      */
-    public function update(int $id, array $data = []): bool
+    public function update(int $id, array $data = []): int
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->update($data);
     }
@@ -111,11 +111,10 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param int $id
      *
-     * @return bool
+     * @return int
      * @throws Exception
-     *
      */
-    public function delete(int $id = 0): bool
+    public function delete(int $id = 0): int
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->delete();
     }

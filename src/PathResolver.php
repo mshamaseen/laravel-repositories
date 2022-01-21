@@ -75,7 +75,8 @@ class PathResolver
     {
         $paths = explode("/", $path);
 
-        for ($i = 1; $i < count($paths); $i++) {
+        $pathsLength = count($paths);
+        for ($i = 1; $i < $pathsLength; $i++) {
             if ($paths[$i] === "..") {
                 unset($paths[$i-1],$paths[$i]);
             }

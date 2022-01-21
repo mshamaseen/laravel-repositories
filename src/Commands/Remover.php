@@ -52,10 +52,6 @@ class Remover extends Command
     {
         $this->userPaths = preg_split(' ([/\\\]) ', $this->argument('name'));
 
-        if (!$this->userPaths) {
-            return 'Name argument is not correct.';
-        }
-
         $this->modelName = array_pop($this->userPaths);
         $this->userPath = implode('/', str_replace('\\', '/', $this->userPaths));
         $this->basePath = $this->option('base') ? $this->option('base') : Config::get('repository.base_path');

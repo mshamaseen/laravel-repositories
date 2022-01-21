@@ -118,7 +118,7 @@ class Controller extends LaravelController
      *
      * @return View|JsonResponse
      */
-    public function index()
+    public function index(): View|JsonResponse
     {
         $this->breadcrumbs->put('index', [
             'link' => $this->resolveRoute($this->routeIndex),
@@ -141,7 +141,7 @@ class Controller extends LaravelController
      *
      * @return View|JsonResponse
      */
-    public function show(int $entityId)
+    public function show(int $entityId): View|JsonResponse
     {
         $this->breadcrumbs->put('view', [
             'link' => '',
@@ -158,7 +158,7 @@ class Controller extends LaravelController
      *
      * @return View|JsonResponse
      */
-    public function create()
+    public function create(): View|JsonResponse
     {
         $this->breadcrumbs->put('create', [
             'link' => $this->resolveRoute($this->createRoute),
@@ -173,7 +173,7 @@ class Controller extends LaravelController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function store()
+    public function store(): JsonResponse|RedirectResponse
     {
         $entity = $this->repository->create($this->request->except(['_token', '_method']));
 
@@ -187,7 +187,7 @@ class Controller extends LaravelController
      *
      * @return View|JsonResponse
      */
-    public function edit(int $entityId)
+    public function edit(int $entityId): View|JsonResponse
     {
         $this->breadcrumbs->put('edit', [
             'link' => '',
@@ -205,11 +205,11 @@ class Controller extends LaravelController
      * @param int $entityId
      * @return JsonResponse|RedirectResponse
      */
-    public function update(int $entityId)
+    public function update(int $entityId): JsonResponse|RedirectResponse
     {
-        $entity = $this->repository->update($entityId, $this->request->except(['_token', '_method']));
+        $updatedCount = $this->repository->update($entityId, $this->request->except(['_token', '_method']));
 
-        return $this->responseDispatcher->update($entity);
+        return $this->responseDispatcher->update($updatedCount);
     }
 
     /**
@@ -220,11 +220,11 @@ class Controller extends LaravelController
      * @return JsonResponse|RedirectResponse
      * @throws Exception
      */
-    public function destroy(int $entityId)
+    public function destroy(int $entityId): JsonResponse|RedirectResponse
     {
-        $deleted = $this->repository->delete($entityId);
+        $deletedCount = $this->repository->delete($entityId);
 
-        return $this->responseDispatcher->destroy($deleted);
+        return $this->responseDispatcher->destroy($deletedCount);
     }
 
     /**
