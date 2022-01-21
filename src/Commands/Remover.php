@@ -17,7 +17,9 @@ class Remover extends Command
      * @var string
      */
     protected $signature = 'ungenerate:repository
-    {name : Class (singular) for example User} {--only-view}';
+    {name : Class (singular) for example User}
+    {--base= : Base path to inject the files\folders in}
+    {--f|force : force deleting the files}';
 
     /**
      * The console command description.
@@ -26,36 +28,20 @@ class Remover extends Command
      */
     protected $description = 'Remove repository files';
 
-    /**
-     * The path entered to set the files in.
-     *
-     * @var string
-     */
-    protected string $path;
-
-    /**
-     * The entered paths by the user
-     *
-     * @var array
-     */
-    protected array $paths;
-
-    /**
-     *
-     * @var string
-     */
+    protected array $userPaths;
     protected string $modelName;
+    protected string $userPath;
+    protected string $basePath;
     private Ungenerator $ungenerator;
     private PathResolver $pathResolver;
 
     /**
      * Create a new command instance.
      */
-    public function __construct(Ungenerator $ungenerator, PathResolver $pathResolver)
+    public function __construct(Ungenerator $ungenerator)
     {
         parent::__construct();
         $this->ungenerator = $ungenerator;
-        $this->pathResolver = $pathResolver;
     }
 
     /**
@@ -64,55 +50,51 @@ class Remover extends Command
      */
     public function handle()
     {
-        $this->paths = preg_split(' ([/\\\]) ', $this->argument('name'));
+        $this->userPaths = preg_split(' ([/\\\]) ', $this->argument('name'));
 
-        if (!$this->paths) {
+        if (!$this->userPaths) {
             return 'Name argument is not correct.';
         }
 
-        $this->modelName = $this->paths[count($this->paths) - 1];
+        $this->modelName = array_pop($this->userPaths);
+        $this->userPath = implode('/', str_replace('\\', '/', $this->userPaths));
+        $this->basePath = $this->option('base') ? $this->option('base') : Config::get('repository.base_path');
 
-        unset($this->paths[count($this->paths) - 1]);
-        $this->path = implode('/', str_replace('\\', '/', $this->paths));
-
+        $this->pathResolver = new PathResolver($this->modelName, $this->userPath, $this->basePath);
         // Configure the generator
-        config(['generator.base_path' => '']);
+        config(['generator.base_path' => base_path($this->basePath)]);
 
-        if (!$this->confirm('This will delete ' . $this->modelName . ' files and folder, Do you want to continue ?')) {
+        if (!$this->option('force') && !$this->confirm('This will delete ' . $this->modelName . ' files and folder, Do you want to continue ?')) {
             return false;
         }
 
-        // Paths
-        $controller = Config::get('repository.controllers_path');
-        $model = Config::get('repository.models_path');
-        $repository = Config::get('repository.repositories_path');
-        $request = Config::get('repository.requests_path');
-        $resource = Config::get('repository.json_resources_path');
+        $this->remove('Controller');
+        $this->remove('Model');
+        $this->remove('Request');
+        $this->remove('Repository');
+        $this->remove('Resource');
 
-        $this->remove('Controller', $controller);
-        $this->remove('Model', $model);
-        $this->remove('Request', $request);
-        $this->remove('Repository', $repository);
-        $this->remove('Resource', $resource);
-
-        RepositoryFilesRemoved::dispatch($this->path,$this->modelName);
+        RepositoryFilesRemoved::dispatch($this->basePath, $this->userPath, $this->modelName);
 
         $this->dumpAutoload();
 
-        return true;
+        return Command::SUCCESS;
     }
 
-    public function remove($type, $typePath): bool
+    public function remove($type): bool
     {
-        $fileToDelete = $this->pathResolver->outputPath($type, $this->path, $this->modelName);
+        $fileToDelete = $this->pathResolver->outputPath($type);
 
-        if (is_file($fileToDelete)) {
+        if (is_file($this->ungenerator->absolutePath($fileToDelete))) {
             $this->ungenerator->output($fileToDelete);
         }
 
-        for ($i = 0; $i < count($this->paths); $i++) {
-            $pathToDelete = implode("/", array_slice($this->paths, 0, count($this->paths) - $i));
-            $pathFromBase = $typePath . "/" . $pathToDelete;
+        $pathsToDelete = count($this->userPaths);
+        for ($i = 0; $i < $pathsToDelete; $i++) {
+            $pathFromBase = $this->ungenerator->absolutePath(
+                $this->pathResolver->directionFromBase($type)
+            );
+
             if (is_dir($pathFromBase) && !(new FilesystemIterator($pathFromBase))->valid()) {
                 rmdir($pathFromBase);
             }

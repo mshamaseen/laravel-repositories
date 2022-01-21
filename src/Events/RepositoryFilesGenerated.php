@@ -9,7 +9,8 @@ class RepositoryFilesGenerated
 {
     use Dispatchable, SerializesModels;
 
-    public string $path;
+    protected string $userPath;
+    protected string $basePath;
     public string $modelName;
 
     /**
@@ -17,9 +18,10 @@ class RepositoryFilesGenerated
      *
      * @return void
      */
-    public function __construct(string $path, string $modelName)
+    public function __construct(string $basePath, string $userPath, string $modelName)
     {
-        $this->path = $path;
+        $this->basePath = $basePath;
+        $this->userPath = $userPath;
         $this->modelName = $modelName;
     }
 }

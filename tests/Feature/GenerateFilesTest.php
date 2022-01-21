@@ -14,6 +14,8 @@ class GenerateFilesTest extends TestCase
 
     private array $filesToGenerate = ['Controller','Repository','Model','Request','Resource'];
 
+    protected string $modelName = 'Test';
+    protected string $userPath = 'Tests';
     /**
      * Some
      *
@@ -26,28 +28,30 @@ class GenerateFilesTest extends TestCase
         parent::__construct($name, $data, $dataName);
     }
 
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->pathResolver = $this->app->make(PathResolver::class);
+        $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
 
-    function test_generate()
+    public function test_generate()
     {
-        $this->artisan('make:repository Tests/Test');
+        $this->artisan("generate:repository $this->userPath/$this->modelName");
 
         foreach ($this->filesToGenerate as $type) {
-            $outputPath = $this->pathResolver->outputPath($type,'Tests','Test');
-            $this->assertFileExists($outputPath);
+            $absolutePath = $this->pathResolver->absolutePath($type);
+
+            $this->assertFileExists($absolutePath);
         }
     }
 
-    function test_ungenerate()
+    public function test_ungenerate()
     {
-        $this->artisan('remove:repository Tests/Test')->expectsConfirmation('This will delete Test files and folder, Do you want to continue ?','yes');
+        $this->artisan("ungenerate:repository $this->userPath/$this->modelName")
+            ->expectsConfirmation('This will delete Test files and folder, Do you want to continue ?', 'yes');
 
         foreach ($this->filesToGenerate as $type) {
-            $outputPath = $this->pathResolver->outputPath($type,'Tests','Test');
+            $outputPath = $this->pathResolver->absolutePath($type);
             $this->assertFileDoesNotExist($outputPath);
         }
     }

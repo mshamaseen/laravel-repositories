@@ -1,7 +1,7 @@
 <?php
-namespace {{typeNamespace}}{{pathNamespace}};
+namespace {{namespace}};
 
-use {{ModelNamespace}}{{pathNamespace}}\{{modelName}};
+use {{ModelNamespace}}\{{modelName}};
 use {{parentClass}} as AbstractRepository;
 
 /**

@@ -197,6 +197,7 @@ abstract class AbstractRepository implements RepositoryInterface
             $scope($newQuery);
         }
 
+        $this->scopes = [];
         return $newQuery;
     }
 }

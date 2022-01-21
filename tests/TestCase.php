@@ -9,31 +9,23 @@ use Shamaseen\Repository\RepositoryServiceProvider;
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected array $configs = [
-        'repository.route_path' => __DIR__ . '/results/routes/',
-        'repository.resources_path' => __DIR__ . '/results/resources',
-        'repository.stubs_path' => __DIR__ . '/results/resources' . '/stubs/',
-        'repository.lang_path' => __DIR__ . '/results/resources/lang/',
-        'repository.controllers_path' => __DIR__ . '/results/app/Http/Controllers',
-        'repository.repositories_path' => __DIR__ . '/results/app/Repositories',
-        'repository.models_path' => __DIR__ . '/results/app/Models',
-        'repository.requests_path' => __DIR__ . '/results/app/Http/Requests',
-        'repository.json_resources_path' => __DIR__ . '/results/app/Http/Resources',
+        'repository.base_path' => 'app',
+        'repository.stubs_path' => __DIR__ . '/results/resources/stubs',
+        'repository.lang_path' => __DIR__ . '/results/resources/lang',
+        'repository.controllers_path' => 'Http/Controllers',
+        'repository.repositories_path' => 'Repositories',
+        'repository.models_path' => 'Models',
+        'repository.requests_path' => 'Http/Requests',
+        'repository.json_resources_path' => 'Http/Resources',
     ];
 
     public function setUp(): void
     {
         parent::setUp();
+        $this->app->setBasePath(realpath(__DIR__ . '/results'));
         $this->alterConfig();
-        $this->makePathIfNotExist(config('repository.route_path'));
-        $this->makePathIfNotExist(config('repository.resources_path'));
         $this->makePathIfNotExist(config('repository.stubs_path'));
         $this->makePathIfNotExist(config('repository.lang_path'));
-        $this->makePathIfNotExist(config('repository.controllers_path'));
-        $this->makePathIfNotExist(config('repository.repositories_path'));
-        $this->makePathIfNotExist(config('repository.models_path'));
-        $this->makePathIfNotExist(config('repository.requests_path'));
-        $this->makePathIfNotExist(config('repository.json_resources_path'));
-
         $this->publishStubs();
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace {{typeNamespace}}{{pathNamespace}};
+namespace {{namespace}};
 
 use {{parentClass}} as Model;
 

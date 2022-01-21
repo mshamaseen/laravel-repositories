@@ -14,50 +14,33 @@ use Shamaseen\Repository\PathResolver;
  */
 class Generator extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'generate:repository
-    {name : Class (singular) for example User}';
+    {name : Class (singular) for example User}
+    {--base= : Base path to inject the files\folders in}
+    {--f|force : force overwrite files}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Create repository files';
 
-    /**
-     * @var string
-     */
     protected string $modelName;
-
-    /**
-     * The path to set the files in.
-     *
-     * @var string
-     */
-    protected string $path;
+    protected string $userPath;
+    // relative to project directory
+    protected string $basePath;
     private GeneratorService $generator;
 
-    // Namespaces
-    private string $repositoriesNamespace;
-    private string $requestsNamespace;
-    private string $modelsNamespace;
-    private string $resourcesNamespace;
     private PathResolver $pathResolver;
 
     /**
      * Create a new command instance.
      */
-    public function __construct(GeneratorService $generator, PathResolver $pathResolver)
+    public function __construct(GeneratorService $generator)
     {
         parent::__construct();
         $this->generator = $generator;
-        $this->pathResolver = $pathResolver;
     }
 
     /**
@@ -72,13 +55,13 @@ class Generator extends Command
             return 'Name argument is not correct.';
         }
 
-        $this->modelName = $paths[count($paths) - 1];
+        $this->modelName = array_pop($paths);
+        $this->userPath = implode('/', str_replace('\\', '/', $paths));
+        $this->basePath = $this->option('base') ? $this->option('base') : Config::get('repository.base_path');
 
-        unset($paths[count($paths) - 1]);
-        $this->path = implode('/', str_replace('\\', '/', $paths));
+        $this->pathResolver = new PathResolver($this->modelName, $this->userPath, $this->basePath);
 
-        // Configure the generator
-        config(['generator.base_path' => '']);
+        config(['generator.base_path' => base_path($this->basePath)]);
 
         return $this->makeRepositoryPatternFiles();
     }
@@ -92,23 +75,17 @@ class Generator extends Command
         $requestParent = Config::get('repository.request_parent');
         $resourceParent = Config::get('repository.resource_parent');
 
-        // Namespaces
-        $this->repositoriesNamespace = Config::get('repository.repositories_namespace');
-        $this->requestsNamespace = Config::get('repository.requests_namespace');
-        $this->modelsNamespace = Config::get('repository.models_namespace');
-        $this->resourcesNamespace = Config::get('repository.resources_namespace');
-
         $this->generate('Controller', $controllerParent);
         $this->generate('Model', $modelParent);
         $this->generate('Request', $requestParent);
         $this->generate('Repository', $repositoryParent);
         $this->generate('Resource', $resourceParent);
 
-        RepositoryFilesGenerated::dispatch($this->path, $this->modelName);
+        RepositoryFilesGenerated::dispatch($this->basePath, $this->userPath, $this->modelName);
 
         $this->dumpAutoload();
 
-        return true;
+        return Command::SUCCESS;
     }
 
     /**
@@ -119,36 +96,30 @@ class Generator extends Command
      */
     protected function generate(string $type, string $parentClass = ''): bool
     {
-        $outputPath = $this->pathResolver->outputPath($type, $this->path, $this->modelName);
+        $outputPath = $this->pathResolver->outputPath($type);
 
-        if ($realpath = realpath($outputPath)) {
+        if (!$this->option('force') && $realpath = realpath($outputPath)) {
             if (!$this->confirm('File '.$realpath.' is exist, do you want to overwrite it?')) {
                 return false;
             }
         }
 
-        $pathNamespace = $this->path ?
-            '\\' . $this->pathResolver->forwardSlashesToBackSlashes($this->path)
-            : '';
-
-        $typeNamespace = $this->pathResolver->typeNamespace($type);
-
+        $namespace = $this->pathResolver->typeNamespace($type);
         $lcModelName = Str::lower($this->modelName);
         $lcPluralModelName = Str::plural($lcModelName);
         $snackLcPluralModelName = Str::snake($this->modelName);
 
         $this->generator->stub($this->pathResolver->getStubPath($type))
-            ->replace('{{parentClass}}', $parentClass) // was base
+            ->replace('{{parentClass}}', $parentClass)
             ->replace('{{modelName}}', $this->modelName)
             ->replace('{{lcModelName}}', $lcModelName)
             ->replace('{{lcPluralModelName}}', $lcPluralModelName)
             ->replace('{{snackLcPluralModelName}}', $snackLcPluralModelName)
-            ->replace('{{typeNamespace}}', $typeNamespace) // was folder
-            ->replace('{{pathNamespace}}', $pathNamespace) // was path
-            ->replace('{{RequestsNamespace}}', $this->requestsNamespace)
-            ->replace('{{RepositoriesNamespace}}', $this->repositoriesNamespace)
-            ->replace('{{ResourcesNamespace}}', $this->resourcesNamespace)
-            ->replace('{{ModelNamespace}}', $this->modelsNamespace)
+            ->replace('{{namespace}}', $namespace)
+            ->replace('{{RequestsNamespace}}', $this->pathResolver->typeNamespace('Request'))
+            ->replace('{{RepositoriesNamespace}}', $this->pathResolver->typeNamespace('Repository'))
+            ->replace('{{ResourcesNamespace}}', $this->pathResolver->typeNamespace('Resource'))
+            ->replace('{{ModelNamespace}}', $this->pathResolver->typeNamespace('Model'))
             ->output($outputPath);
 
         return true;

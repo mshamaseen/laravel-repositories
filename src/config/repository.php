@@ -1,17 +1,22 @@
 <?php
+// we are not using realpath function here because it will not allow the tests to run.
 
 return [
-    // Paths
-    // we are not using realpath function here because it will not allow the tests to run.
-    'route_path' => __DIR__.'/../routes/',
-    'resources_path' => __DIR__.'/../resources',
-    'stubs_path' => __DIR__.'/../resources' . '/stubs/',
-    'lang_path' => __DIR__.'/../resources/lang/',
-    'controllers_path' => __DIR__ . '/../app/Http/Controllers',
-    'repositories_path' => __DIR__ . '/../app/Repositories',
-    'models_path' => __DIR__ . '/../app/Models',
-    'requests_path' => __DIR__ . '/../app/Http/Requests',
-    'json_resources_path' => __DIR__ . '/../app/Http/Resources',
+    // we need this to publish language files
+    'lang_path' => '../resources/lang',
+
+    // base path to all relative paths, absolute paths wil ignore the base file.
+    'base_path' => 'app', // relative to project directory, DON'T USE 1- absolute paths here or 2- laravel path functions.
+
+    // this is an example of absolute path, which means base path will have no effect on it.
+    'stubs_path' => __DIR__.'/../resources/stubs',
+
+    // Relative paths
+    'controllers_path' => 'Http/Controllers',
+    'repositories_path' => 'Repositories',
+    'models_path' => 'Models',
+    'requests_path' => 'Http/Requests',
+    'json_resources_path' => 'Http/Resources',
 
     // Parent classes
     'controller_parent' => 'Shamaseen\Repository\Utility\Controller',
@@ -19,13 +24,6 @@ return [
     'model_parent' => 'Shamaseen\Repository\Utility\Model',
     'repository_parent' => 'Shamaseen\Repository\Utility\AbstractRepository',
     'request_parent' => 'Shamaseen\Repository\Utility\Request',
-
-    // Namespaces
-    'controllers_namespace' => 'App\Http\Controllers',
-    'repositories_namespace' => 'App\Repositories',
-    'requests_namespace' => 'App\Http\Requests',
-    'models_namespace' => 'App\Models',
-    'resources_namespace' => 'App\Http\Resources',
 
     /*
      * Available options:

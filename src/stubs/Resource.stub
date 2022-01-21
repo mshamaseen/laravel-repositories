@@ -1,9 +1,9 @@
 <?php
 
-namespace {{typeNamespace}}{{pathNamespace}};
+namespace {{namespace}};
 
 use {{parentClass}} as JsonResource;
-use {{RequestsNamespace}}{{pathNamespace}}\{{modelName}}Request;
+use {{RequestsNamespace}}\{{modelName}}Request;
 
 /**
  * Class {{modelName}}Resource
