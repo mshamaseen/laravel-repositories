@@ -5,7 +5,7 @@ namespace {{namespace}};
 use {{parentClass}} as Request;
 
 /**
- * Class {{modelName}}Request
+ * Class {{modelName}}Request.
  */
 class {{modelName}}Request extends Request
 {

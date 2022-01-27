@@ -2,15 +2,16 @@
 
 namespace {{namespace}};
 
+use {{parentClass}} as Controller;
 use {{RepositoriesNamespace}}\{{modelName}}Repository;
 use {{RequestsNamespace}}\{{modelName}}Request;
-use {{ResourcesNamespace}}\{{modelName}}Resource;
 use {{ResourcesNamespace}}\{{modelName}}Collection;
-use {{parentClass}} as Controller;
+use {{ResourcesNamespace}}\{{modelName}}Resource;
 
 /**
- * Class {{modelName}}Controller
- * @property-read {{modelName}}Repository $repository
+ * Class {{modelName}}Controller.
+ *
+ * @property {{modelName}}Repository $repository
  */
 class {{modelName}}Controller extends Controller
 {

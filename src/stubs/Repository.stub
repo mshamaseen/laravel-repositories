@@ -1,12 +1,13 @@
 <?php
 namespace {{namespace}};
 
-use {{ModelNamespace}}\{{modelName}};
 use {{parentClass}} as AbstractRepository;
+use {{ModelNamespace}}\{{modelName}};
 
 /**
- * Class {{modelName}}Repository
- * @property-read {{modelName}} $model
+ * Class {{modelName}}Repository.
+ *
+ * @property {{modelName}} $model
  */
 class {{modelName}}Repository extends AbstractRepository
 {

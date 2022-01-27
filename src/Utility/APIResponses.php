@@ -4,7 +4,6 @@ namespace Shamaseen\Repository\Utility;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Shamaseen\Repository\Interfaces\CrudResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,11 +19,7 @@ class APIResponses implements CrudResponse
 
     public function index($paginate): JsonResponse
     {
-        /**
-         * @noinspection PhpUndefinedMethodInspection
-         * @var AnonymousResourceCollection $resource
-         */
-        $resource = $this->controller->collectionClass::collection($paginate);
+        $resource = new $this->controller->collectionClass($paginate);
 
         $response = $resource->response();
         $code = Response::HTTP_OK;

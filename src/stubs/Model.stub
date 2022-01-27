@@ -5,7 +5,7 @@ namespace {{namespace}};
 use {{parentClass}} as Model;
 
 /**
- * Class {{modelName}}
+ * Class {{modelName}}.
  */
 class {{modelName}} extends Model
 {

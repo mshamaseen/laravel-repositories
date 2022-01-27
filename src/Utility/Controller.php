@@ -2,7 +2,6 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use App;
 use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -12,8 +11,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Routing\Controller as LaravelController;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
-use URL;
 
 /**
  * Class BaseController.
