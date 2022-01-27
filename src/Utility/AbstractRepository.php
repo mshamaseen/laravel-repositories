@@ -1,10 +1,10 @@
 <?php
+/** @noinspection PhpUndefinedMethodInspection */
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
-use Exception;
 use Illuminate\Container\Container as App;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -100,10 +100,9 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @param int $id
      * @param array $data
-     *
-     * @return int
+     * @return int|bool|EloquentModel
      */
-    public function update(int $id, array $data = []): int
+    public function update(int $id, array $data = []): int | bool | EloquentModel
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->update($data);
     }
@@ -111,10 +110,9 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param int $id
      *
-     * @return int
-     * @throws Exception
+     * @return int|bool
      */
-    public function delete(int $id = 0): int
+    public function delete(int $id = 0): int | bool
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->delete();
     }

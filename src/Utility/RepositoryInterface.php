@@ -50,15 +50,13 @@ interface RepositoryInterface
      * @param int $id
      * @param array $data
      *
-     * @return int
      */
-    public function update(int $id, array $data = []): int;
+    public function update(int $id, array $data = []): int | bool | EloquentModel;
 
     /**
      * @param int $id
      *
-     * @return int
      * @throws Exception
      */
-    public function delete(int $id = 0): int;
+    public function delete(int $id = 0): int | bool;
 }

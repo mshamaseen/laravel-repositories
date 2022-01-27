@@ -57,24 +57,21 @@ class Controller extends LaravelController
 
     public array $params = [];
 
-    public ?string $resource;
-
     public ResponseDispatcher $responseDispatcher;
-    private string $requestClass;
-    private ?string $resourceClass;
+    public string $requestClass;
+    public ?string $resourceClass;
+    public ?string $collectionClass;
 
     /**
      * BaseController constructor.
      *
      * @param AbstractRepository $repository
      * @param string $requestClass
-     * @param string|null $resource
      */
-    public function __construct(AbstractRepository $repository, string $requestClass, string $resource = null)
+    public function __construct(AbstractRepository $repository, string $requestClass)
     {
         $this->repository = $repository;
         $this->breadcrumbs = new Collection();
-        $this->resource = $resource;
         $this->paginateType = $this->paginateType ?? config('repository.default_pagination');
         $this->requestClass = $requestClass;
     }

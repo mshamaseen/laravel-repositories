@@ -5,6 +5,7 @@ namespace {{namespace}};
 use {{RepositoriesNamespace}}\{{modelName}}Repository;
 use {{RequestsNamespace}}\{{modelName}}Request;
 use {{ResourcesNamespace}}\{{modelName}}Resource;
+use {{ResourcesNamespace}}\{{modelName}}Collection;
 use {{parentClass}} as Controller;
 
 /**
@@ -31,6 +32,8 @@ class {{modelName}}Controller extends Controller
      */
     public function __construct({{modelName}}Repository $repository)
     {
-        parent::__construct($repository, {{modelName}}Request::class, {{modelName}}Resource::class);
+        $this->resourceClass = {{modelName}}Resource::class;
+        $this->collectionClass = {{modelName}}Collection::class;
+        parent::__construct($repository, {{modelName}}Request::class);
     }
 }

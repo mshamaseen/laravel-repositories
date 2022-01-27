@@ -24,6 +24,7 @@ class PathResolver
         'Repository' => 'repositories_path',
         'Request' => 'requests_path',
         'Resource' => 'json_resources_path',
+        'Collection' => 'json_resources_path',
     ];
 
     /**

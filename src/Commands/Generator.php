@@ -74,12 +74,14 @@ class Generator extends Command
         $controllerParent = Config::get('repository.controller_parent');
         $requestParent = Config::get('repository.request_parent');
         $resourceParent = Config::get('repository.resource_parent');
+        $collectionParent = Config::get('repository.collection_parent');
 
         $this->generate('Controller', $controllerParent);
         $this->generate('Model', $modelParent);
         $this->generate('Request', $requestParent);
         $this->generate('Repository', $repositoryParent);
         $this->generate('Resource', $resourceParent);
+        $this->generate('Collection', $collectionParent);
 
         RepositoryFilesGenerated::dispatch($this->basePath, $this->userPath, $this->modelName);
 

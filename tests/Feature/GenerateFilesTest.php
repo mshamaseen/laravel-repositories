@@ -12,7 +12,7 @@ class GenerateFilesTest extends TestCase
      */
     private PathResolver $pathResolver;
 
-    private array $filesToGenerate = ['Controller','Repository','Model','Request','Resource'];
+    private array $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection'];
 
     protected string $modelName = 'Test';
     protected string $userPath = 'Tests';
