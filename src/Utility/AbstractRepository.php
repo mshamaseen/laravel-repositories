@@ -5,21 +5,19 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use Illuminate\Container\Container as App;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class Database.
  */
 abstract class AbstractRepository implements RepositoryInterface
 {
-    protected App $app;
-
-    protected Model $model;
+    protected EloquentModel $model;
 
     protected ?string $order = null;
 
@@ -31,7 +29,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     public function __construct()
     {
-        $this->model = \App::make($this->getModelClass());
+        $this->model = App::make($this->getModelClass());
     }
 
     /**
