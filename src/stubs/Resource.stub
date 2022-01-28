@@ -2,10 +2,10 @@
 
 namespace {{namespace}};
 
-use {{RequestsNamespace}}\{{modelName}}Request;
 use Illuminate\Contracts\Support\Arrayable;
-use {{parentClass}} as JsonResource;
+use Illuminate\Http\Request;
 use JsonSerializable;
+use {{parentClass}} as JsonResource;
 
 /**
  * Class {{modelName}}Resource.
@@ -15,7 +15,8 @@ class {{modelName}}Resource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param {{modelName}}Request  $request
+     * @param Request $request
+     * @return array|Arrayable|JsonSerializable
      */
     public function toArray($request): array|Arrayable|JsonSerializable
     {

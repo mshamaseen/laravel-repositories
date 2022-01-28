@@ -2,10 +2,10 @@
 
 namespace {{namespace}};
 
-use {{RequestsNamespace}}\{{modelName}}Request;
 use Illuminate\Contracts\Support\Arrayable;
-use {{parentClass}} as ResourceCollection;
+use Illuminate\Http\Request;
 use JsonSerializable;
+use Shamaseen\Repository\Utility\ResourceCollection as ResourceCollection;
 
 /**
  * Class {{modelName}}Collection.
@@ -15,7 +15,8 @@ class {{modelName}}Collection extends ResourceCollection
     /**
      * Transform the resource collection into an array.
      *
-     * @param  {{modelName}}Request  $request
+     * @param Request $request
+     * @return array|Arrayable|JsonSerializable
      */
     public function toArray($request): array|Arrayable|JsonSerializable
     {

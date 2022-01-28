@@ -45,14 +45,15 @@ class Generator extends Command
 
     /**
      * Execute the console command.
-     *
      */
     public function handle(): int
     {
         $paths = preg_split(' ([/\\\]) ', $this->argument('name'));
 
         if (!$paths) {
-            return 'Name argument is not correct.';
+            $this->error('Name argument is not correct.');
+
+            return Command::FAILURE;
         }
 
         $this->modelName = array_pop($paths);
@@ -92,9 +93,6 @@ class Generator extends Command
 
     /**
      * @param string $type define which kind of files should be generated
-     * @param string $parentClass
-     *
-     * @return bool
      */
     protected function generate(string $type, string $parentClass = ''): bool
     {
