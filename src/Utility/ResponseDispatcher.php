@@ -66,7 +66,7 @@ class ResponseDispatcher implements CrudResponse
         return $this->dispatcher->edit($entity);
     }
 
-    public function update(int $updatedCount): JsonResponse|RedirectResponse
+    public function update(int|bool|Model $updatedCount): JsonResponse|RedirectResponse
     {
         return $this->dispatcher->update($updatedCount);
     }
