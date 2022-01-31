@@ -97,8 +97,8 @@ trait Criteriable
      */
     public function getFilterables(): array
     {
-        if ($this->searchables !== null) {
-            return $this->searchables;
+        if ($this->filterable !== null) {
+            return $this->filterable;
         }
 
         return array_diff($this->getFillable(), $this->getHidden());
