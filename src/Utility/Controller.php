@@ -12,7 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -232,6 +232,6 @@ class Controller extends LaravelController
      */
     public function resolveRoute(string $route): string
     {
-        return URL::isValidUrl($route) ? $route : route($route);
+        return Route::has($route) ? route($route) :  $route;
     }
 }
