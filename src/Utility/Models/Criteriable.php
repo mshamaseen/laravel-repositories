@@ -13,20 +13,20 @@ trait Criteriable
     {
         foreach ($this->getFilterables() as $method => $columns) {
             // if this is associative then it is a relation
-            if (gettype($method) === "string") {
+            if ('string' === gettype($method)) {
                 if (method_exists($this, $method) && array_key_exists($method, $criteria)) {
                     $query->whereHas($method, function ($query) use ($criteria, $columns, $method) {
                         /* @var $query Builder */
                         $query->where(function ($query2) use ($criteria, $columns, $method) {
                             /* @var $query2 Builder */
-                            foreach ((array)$columns as $column) {
+                            foreach ((array) $columns as $column) {
                                 $query2->where($column, $criteria[$method]);
                             }
                         });
                     });
                 }
             } elseif (array_key_exists($columns, $criteria)) {
-                $query->where($columns, $criteria);
+                $query->where($columns, $criteria[$columns]);
             }
         }
 
@@ -37,7 +37,7 @@ trait Criteriable
     {
         if (isset($criteria['search'])) {
             $query->where(function ($q) use ($criteria) {
-                /**
+                /*
                  * @var Builder $q
                  */
                 foreach ($this->getSearchables() as $method => $columns) {
@@ -46,13 +46,13 @@ trait Criteriable
                             /* @var $query Builder */
                             $query->where(function ($query2) use ($criteria, $columns) {
                                 /* @var $query2 Builder */
-                                foreach ((array)$columns as $column) {
-                                    $query2->orWhere($column, 'like', '%' . $criteria['search'] . '%');
+                                foreach ((array) $columns as $column) {
+                                    $query2->orWhere($column, 'like', '%'.$criteria['search'].'%');
                                 }
                             });
                         });
                     } else {
-                        $q->orWhere($columns, 'like', '%' . $criteria['search'] . '%');
+                        $q->orWhere($columns, 'like', '%'.$criteria['search'].'%');
                     }
                 }
             });
@@ -72,12 +72,11 @@ trait Criteriable
 
     /**
      * By default, all fillables and not hidden are searchables, if you want to override that explicitly set an array of searchables.
-     * For a relation this is the syntax [ relationName => [columns in the relation] ]
-     * @return array
+     * For a relation this is the syntax [ relationName => [columns in the relation] ].
      */
     public function getSearchables(): array
     {
-        if ($this->searchables !== null) {
+        if (null !== $this->searchables) {
             return $this->searchables;
         }
 
@@ -87,17 +86,17 @@ trait Criteriable
     public function setSearchables($searchables): self
     {
         $this->searchables = $searchables;
+
         return $this;
     }
 
     /**
      * By default, all fillables and not hidden are filterables, if you want to override that explicitly set an array of searchables.
-     * For a relation this is the syntax [ relationName => [columns in the relation] ]
-     * @return array
+     * For a relation this is the syntax [ relationName => [columns in the relation] ].
      */
     public function getFilterables(): array
     {
-        if ($this->filterable !== null) {
+        if (null !== $this->filterable) {
             return $this->filterable;
         }
 
@@ -107,6 +106,7 @@ trait Criteriable
     public function setFilterables($searchables): self
     {
         $this->searchables = $searchables;
+
         return $this;
     }
 }
