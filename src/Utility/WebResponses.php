@@ -58,7 +58,7 @@ class WebResponses implements CrudResponse
             ->with('entity', $entity);
     }
 
-    public function update(int $updatedCount): RedirectResponse
+    public function update(int|bool|Model $updatedCount): RedirectResponse
     {
         return Redirect::to($this->controller->resolveRoute($this->controller->routeIndex))
             ->with('message', __('repository.modified_successfully'))

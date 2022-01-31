@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
@@ -33,10 +35,6 @@ class APIResponses implements CrudResponse
         return $response->setStatusCode($code);
     }
 
-    /**
-     * @param EloquentModel $entity
-     * @return JsonResponse
-     */
     public function show(EloquentModel $entity): JsonResponse
     {
         /**
@@ -53,7 +51,7 @@ class APIResponses implements CrudResponse
         return response()->json(
             [
                 'message' => __('repository.no_content'),
-                'data' => $this->controller->params
+                'data' => $this->controller->params,
             ],
             Response::HTTP_NO_CONTENT
         );
@@ -69,7 +67,7 @@ class APIResponses implements CrudResponse
         return $resource
             ->additional([
                 'message' => __('repository.created_successfully'),
-                ...$this->controller->params
+                ...$this->controller->params,
             ])
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
@@ -80,18 +78,18 @@ class APIResponses implements CrudResponse
         return response()->json(
             [
                 'message' => __('repository.no_content'),
-                'data' => $this->controller->params
+                'data' => $this->controller->params,
             ],
             Response::HTTP_NO_CONTENT
         );
     }
 
-    public function update(int $updatedCount): JsonResponse
+    public function update(int|bool|EloquentModel $updatedCount): JsonResponse
     {
         return response()->json(
             [
                 'message' => __('repository.modified_successfully'),
-                'data' => $this->controller->params
+                'data' => $this->controller->params,
             ],
             Response::HTTP_OK
         );
@@ -101,7 +99,7 @@ class APIResponses implements CrudResponse
     {
         return response()->json([
             'message' => __('repository.deleted_successfully'),
-            'data' => $this->controller->params
+            'data' => $this->controller->params,
         ], Response::HTTP_OK);
     }
 }

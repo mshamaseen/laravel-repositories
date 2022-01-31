@@ -11,6 +11,6 @@ interface CrudResponse
     public function create();
     public function store(Model $entity);
     public function edit(Model $entity);
-    public function update(int $updatedCount);
+    public function update(int|bool|Model $updatedCount);
     public function destroy(int $destroyedCount);
 }

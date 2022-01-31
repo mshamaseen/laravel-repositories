@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpUndefinedMethodInspection */
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
@@ -32,17 +33,8 @@ abstract class AbstractRepository implements RepositoryInterface
         $this->model = App::make($this->getModelClass());
     }
 
-    /**
-     * @return string
-     */
     abstract protected function getModelClass(): string;
 
-    /**
-     * @param int $limit
-     * @param array $criteria
-     *
-     * @return LengthAwarePaginator
-     */
     public function paginate(int $limit = 10, array $criteria = []): LengthAwarePaginator
     {
         $this->injectDefaultCriteria($criteria);
@@ -55,12 +47,6 @@ abstract class AbstractRepository implements RepositoryInterface
             ->paginate($limit);
     }
 
-    /**
-     * @param int $limit
-     * @param array $criteria
-     *
-     * @return Paginator
-     */
     public function simplePaginate(int $limit = 10, array $criteria = []): Paginator
     {
         return $this->getNewBuilderWithScope()
@@ -72,9 +58,6 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @param int $id
-     * @param array $columns
-     *
      * @return Model|null
      */
     public function findOrFail(int $id, array $columns = ['*']): ?EloquentModel
@@ -84,41 +67,22 @@ abstract class AbstractRepository implements RepositoryInterface
             ->findOrFail($id, $columns);
     }
 
-    /**
-     * @param array $data
-     *
-     * @return EloquentModel|null
-     */
     public function create(array $data = []): ?EloquentModel
     {
         return $this->getNewBuilderWithScope()->create($data);
     }
 
-    /**
-     *
-     * @param int $id
-     * @param array $data
-     * @return int|bool|EloquentModel
-     */
-    public function update(int $id, array $data = []): int | bool | EloquentModel
+    public function update(int $id, array $data = []): int|bool|EloquentModel
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->update($data);
     }
 
-    /**
-     * @param int $id
-     *
-     * @return int|bool
-     */
-    public function delete(int $id = 0): int | bool
+    public function delete(int $id = 0): int|bool
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->delete();
     }
 
     /**
-     * @param array $criteria
-     *
-     * @param array $columns
      * @return Builder[]|Collection
      */
     public function get(array $criteria = [], array $columns = ['*']): Collection|array
@@ -138,12 +102,6 @@ abstract class AbstractRepository implements RepositoryInterface
             ->find($id, $columns);
     }
 
-    /**
-     * @param array $criteria
-     * @param array $columns
-     *
-     * @return Model|null
-     */
     public function first(array $criteria = [], array $columns = ['*']): ?Model
     {
         return $this->getNewBuilderWithScope()
@@ -154,13 +112,6 @@ abstract class AbstractRepository implements RepositoryInterface
             ->first($columns);
     }
 
-    /**
-     * @param string $key
-     * @param array $criteria
-     * @param array $columns
-     *
-     * @return Model|null
-     */
     public function last(string $key = 'id', array $criteria = [], array $columns = ['*']): ?Model
     {
         return $this->getNewBuilderWithScope()
@@ -171,7 +122,6 @@ abstract class AbstractRepository implements RepositoryInterface
             ->first($columns);
     }
 
-
     public function injectDefaultCriteria(&$criteria)
     {
         $criteria['order'] = $criteria['order'] ?? $this->order;
@@ -181,6 +131,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function scope(callable $callable): static
     {
         $this->scopes[] = $callable;
+
         return $this;
     }
 
@@ -193,6 +144,7 @@ abstract class AbstractRepository implements RepositoryInterface
         }
 
         $this->scopes = [];
+
         return $newQuery;
     }
 }
