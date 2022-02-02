@@ -4,6 +4,7 @@ namespace Shamaseen\Repository\Utility;
 
 use Eloquent;
 use \Illuminate\Database\Eloquent\Builder;
+use Shamaseen\Repository\Utility\Models\CachePerRequest;
 use Shamaseen\Repository\Utility\Models\Criteriable;
 
 /**
@@ -22,6 +23,7 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
 class Model extends Eloquent
 {
     use Criteriable;
+    use CachePerRequest;
 
     protected $dates = [
         'created_at',
