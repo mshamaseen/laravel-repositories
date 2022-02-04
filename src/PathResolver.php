@@ -25,32 +25,29 @@ class PathResolver
         'Request' => 'requests_path',
         'Resource' => 'json_resources_path',
         'Collection' => 'json_resources_path',
+        'Policy' => 'policies_path',
     ];
 
-    /**
-     * @param string $type
-     * @return string
-     */
     public function outputPath(string $type): string
     {
-        return $type === 'Model'
-            ? $this->directionFromBase($type) . "/" . $this->modelName . ".php"
-            : $this->directionFromBase($type) . "/" . $this->modelName . $type . ".php";
+        return 'Model' === $type
+            ? $this->directionFromBase($type).'/'.$this->modelName.'.php'
+            : $this->directionFromBase($type).'/'.$this->modelName.$type.'.php';
     }
 
     public function directionFromBase($type): string
     {
-        return $this->typePath($type) . $this->pathSection($this->userPath);
+        return $this->typePath($type).$this->pathSection($this->userPath);
     }
 
     public function absolutePath($type): string
     {
-        return base_path($this->basePath ."/" . $this->outputPath($type));
+        return base_path($this->basePath.'/'.$this->outputPath($type));
     }
 
     public function pathSection(?string $section): string
     {
-        return $section ? "/".$section : '';
+        return $section ? '/'.$section : '';
     }
 
     public function typePath(string $type): string
@@ -68,43 +65,39 @@ class PathResolver
     }
 
     /**
-     * Resolve each ../
-     * @param string $path
-     * @return string
+     * Resolve each ../.
      */
     public function resolvePath(string $path): string
     {
-        $paths = explode("/", $path);
+        $paths = explode('/', $path);
 
         $pathsLength = count($paths);
-        for ($i = 1; $i < $pathsLength; $i++) {
-            if ($paths[$i] === "..") {
-                unset($paths[$i-1],$paths[$i]);
+        for ($i = 1; $i < $pathsLength; ++$i) {
+            if ('..' === $paths[$i]) {
+                unset($paths[$i - 1],$paths[$i]);
             }
         }
 
-        return implode("/", $paths);
+        return implode('/', $paths);
     }
 
     public function typeNamespace(string $type): string
     {
-        $resolvedPath = $this->resolvePath($this->basePath . "/". $this->typePath($type) . $this->pathSection($this->userPath));
+        $resolvedPath = $this->resolvePath($this->basePath.'/'.$this->typePath($type).$this->pathSection($this->userPath));
 
         $upperCaseEachSection = Str::of($resolvedPath)->explode('/')
-            ->reduce(fn ($total, $part) => $total."/".ucfirst($part));
+            ->reduce(fn ($total, $part) => $total.'/'.ucfirst($part));
 
-        return Str::of($this->getPathRelativeToProject($upperCaseEachSection))->ltrim('/')->replace("/", "\\");
+        return Str::of($this->getPathRelativeToProject($upperCaseEachSection))->ltrim('/')->replace('/', '\\');
     }
 
     /**
      * Get stub path base on type.
      *
      * @param string $type determine which stub should choose to get content
-     *
-     * @return string
      */
     public function getStubPath(string $type): string
     {
-        return Config::get('repository.stubs_path') . "/$type.stub";
+        return Config::get('repository.stubs_path')."/$type.stub";
     }
 }

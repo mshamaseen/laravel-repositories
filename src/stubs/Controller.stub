@@ -3,10 +3,11 @@
 namespace {{namespace}};
 
 use {{parentClass}} as Controller;
-use {{RepositoriesNamespace}}\{{modelName}}Repository;
 use {{RequestsNamespace}}\{{modelName}}Request;
 use {{ResourcesNamespace}}\{{modelName}}Collection;
 use {{ResourcesNamespace}}\{{modelName}}Resource;
+use {{PoliciesNamespace}}\{{modelName}}Policy;
+use {{RepositoriesNamespace}}\{{modelName}}Repository;
 
 /**
  * Class {{modelName}}Controller.
@@ -26,6 +27,11 @@ class {{modelName}}Controller extends Controller
     public string $viewEdit = '{{lcPluralModelName}}.edit';
     public string $viewShow = '{{lcPluralModelName}}.show';
 
+    public ?string $resourceClass = {{modelName}}Resource::class;
+    public ?string $collectionClass = {{modelName}}Collection::class;
+    public ?string $policyClass = {{modelName}}Policy::class;
+    public string $requestClass = {{modelName}}Request::class;
+
     /**
      * {{modelName}}Controller constructor.
      *
@@ -33,8 +39,6 @@ class {{modelName}}Controller extends Controller
      */
     public function __construct({{modelName}}Repository $repository)
     {
-        $this->resourceClass = {{modelName}}Resource::class;
-        $this->collectionClass = {{modelName}}Collection::class;
-        parent::__construct($repository, {{modelName}}Request::class);
+        parent::__construct($repository);
     }
 }

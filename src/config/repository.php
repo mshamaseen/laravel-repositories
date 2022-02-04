@@ -1,4 +1,5 @@
 <?php
+
 // we are not using realpath function here because it will not allow the tests to run.
 
 return [
@@ -17,6 +18,7 @@ return [
     'models_path' => 'Models',
     'requests_path' => 'Http/Requests',
     'json_resources_path' => 'Http/Resources',
+    'policies_path' => 'Policies',
 
     // Parent classes
     'controller_parent' => 'Shamaseen\Repository\Utility\Controller',
@@ -38,5 +40,5 @@ return [
      * Available Options:
      * api, web, both
      */
-    'responses' => 'both'
+    'responses' => 'both',
 ];

@@ -1,0 +1,8 @@
+<?php
+
+namespace {{namespace}};
+
+class {{modelName}}Policy
+{
+    // Any method here that match the controller method name will be automatically called.
+}

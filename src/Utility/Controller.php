@@ -5,6 +5,8 @@
 namespace Shamaseen\Repository\Utility;
 
 use Exception;
+use \Illuminate\Support\Facades\Gate;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -58,19 +60,30 @@ class Controller extends LaravelController
     public array $params = [];
 
     public ResponseDispatcher $responseDispatcher;
-    public string $requestClass;
+    public string $requestClass = Request::class;
+    public ?string $policyClass = null;
     public ?string $resourceClass;
     public ?string $collectionClass;
 
     /**
      * BaseController constructor.
      */
-    public function __construct(AbstractRepository $repository, string $requestClass)
+    public function __construct(AbstractRepository $repository)
     {
         $this->repository = $repository;
         $this->breadcrumbs = new Collection();
         $this->paginateType = $this->paginateType ?? config('repository.default_pagination');
-        $this->requestClass = $requestClass;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function authorizeAction(string $action): void
+    {
+        if ($this->policyClass && method_exists($this->policyClass, $action)) {
+            Gate::policy($this->repository->getModelClass(), $this->policyClass)
+                ->authorize($action, $this->repository->getModelClass());
+        }
     }
 
     /**
@@ -81,10 +94,14 @@ class Controller extends LaravelController
      * @param $parameters
      *
      * @return Response
+     *
+     * @throws AuthorizationException
      */
     public function callAction($method, $parameters)
     {
         $this->request = App::make($this->requestClass, ['repository' => $this->repository]);
+
+        $this->authorizeAction($method);
 
         $this->isAPI = $this->request->expectsJson();
         $this->limit = min($this->request->get('limit', $this->limit), $this->maxLimit);

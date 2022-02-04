@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\App;
  */
 abstract class AbstractRepository implements RepositoryInterface
 {
-    protected EloquentModel $model;
+    public EloquentModel $model;
 
     protected ?string $order = null;
 
@@ -33,7 +33,7 @@ abstract class AbstractRepository implements RepositoryInterface
         $this->model = App::make($this->getModelClass());
     }
 
-    abstract protected function getModelClass(): string;
+    abstract public function getModelClass(): string;
 
     public function paginate(int $limit = 10, array $criteria = []): LengthAwarePaginator
     {

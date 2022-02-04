@@ -83,6 +83,7 @@ class Generator extends Command
         $this->generate('Repository', $repositoryParent);
         $this->generate('Resource', $resourceParent);
         $this->generate('Collection', $collectionParent);
+        $this->generate('Policy');
 
         RepositoryFilesGenerated::dispatch($this->basePath, $this->userPath, $this->modelName);
 
@@ -120,6 +121,7 @@ class Generator extends Command
             ->replace('{{RepositoriesNamespace}}', $this->pathResolver->typeNamespace('Repository'))
             ->replace('{{ResourcesNamespace}}', $this->pathResolver->typeNamespace('Resource'))
             ->replace('{{ModelNamespace}}', $this->pathResolver->typeNamespace('Model'))
+            ->replace('{{PoliciesNamespace}}', $this->pathResolver->typeNamespace('Policy'))
             ->output($outputPath);
 
         return true;

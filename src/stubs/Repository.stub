@@ -16,7 +16,7 @@ class {{modelName}}Repository extends AbstractRepository
     /**
      * @return string
      */
-    protected function getModelClass(): string
+    public function getModelClass(): string
     {
         return {{modelName}}::class;
     }

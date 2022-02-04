@@ -19,7 +19,7 @@ class RepositoryServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Generator::class,
-                Remover::class
+                Remover::class,
             ]);
         }
 
@@ -28,7 +28,6 @@ class RepositoryServiceProvider extends ServiceProvider
             __DIR__.'/config/repository.php' => config_path('repository.php'),
             __DIR__.'/lang/repository.php' => lang_path('en/repository.php'),
         ], 'repository');
-
 
         //if the configuration is not published then use the package one
         if (null === $this->app['config']->get('repository')) {
@@ -50,5 +49,9 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/config/repository.php',
+            'repository'
+        );
     }
 }
