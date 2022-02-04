@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace Shamaseen\Repository\Utility;
 
@@ -9,8 +11,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Collection;
 use Illuminate\Routing\Controller as LaravelController;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +22,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Controller extends LaravelController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests;
+    use DispatchesJobs;
+    use ValidatesRequests;
 
     public AbstractRepository $repository;
     public Request $request;
@@ -32,9 +36,7 @@ class Controller extends LaravelController
     public Collection $breadcrumbs;
 
     /**
-     * Can be either a route name or a URL
-     *
-     * @var string
+     * Can be either a route name or a URL.
      */
     public string $routeIndex = '';
     public string $createRoute = '';
@@ -50,8 +52,6 @@ class Controller extends LaravelController
 
     /**
      * Allow returning trash if the frontend user request it.
-     *
-     * @var bool
      */
     public bool $allowTrashRequest = false;
 
@@ -64,9 +64,6 @@ class Controller extends LaravelController
 
     /**
      * BaseController constructor.
-     *
-     * @param AbstractRepository $repository
-     * @param string $requestClass
      */
     public function __construct(AbstractRepository $repository, string $requestClass)
     {
@@ -82,6 +79,7 @@ class Controller extends LaravelController
      *
      * @param $method
      * @param $parameters
+     *
      * @return Response
      */
     public function callAction($method, $parameters)
@@ -109,11 +107,8 @@ class Controller extends LaravelController
         return parent::callAction($method, $parameters);
     }
 
-
     /**
      * Display a listing of the model.
-     *
-     * @return View|JsonResponse
      */
     public function index(): View|JsonResponse
     {
@@ -122,7 +117,7 @@ class Controller extends LaravelController
             'text' => $this->pageTitle,
         ]);
 
-        if ($this->paginateType === 'simple') {
+        if ('simple' === $this->paginateType) {
             $paginate = $this->repository->simplePaginate($this->limit, $this->request->all());
         } else {
             $paginate = $this->repository->paginate($this->limit, $this->request->all());
@@ -133,10 +128,6 @@ class Controller extends LaravelController
 
     /**
      * Display the specified resource.
-     *
-     * @param int $entityId
-     *
-     * @return View|JsonResponse
      */
     public function show(int $entityId): View|JsonResponse
     {
@@ -152,8 +143,6 @@ class Controller extends LaravelController
 
     /**
      * Show the form to create a new resource, only for web responses.
-     *
-     * @return View|JsonResponse
      */
     public function create(): View|JsonResponse
     {
@@ -167,8 +156,6 @@ class Controller extends LaravelController
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @return JsonResponse|RedirectResponse
      */
     public function store(): JsonResponse|RedirectResponse
     {
@@ -179,10 +166,6 @@ class Controller extends LaravelController
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param int $entityId
-     *
-     * @return View|JsonResponse
      */
     public function edit(int $entityId): View|JsonResponse
     {
@@ -198,9 +181,6 @@ class Controller extends LaravelController
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param int $entityId
-     * @return JsonResponse|RedirectResponse
      */
     public function update(int $entityId): JsonResponse|RedirectResponse
     {
@@ -212,9 +192,6 @@ class Controller extends LaravelController
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $entityId
-     *
-     * @return JsonResponse|RedirectResponse
      * @throws Exception
      */
     public function destroy(int $entityId): JsonResponse|RedirectResponse
@@ -225,13 +202,10 @@ class Controller extends LaravelController
     }
 
     /**
-     * Return a URI from a route or URL
-     *
-     * @param string $route
-     * @return string
+     * Return a URI from a route or URL.
      */
     public function resolveRoute(string $route): string
     {
-        return Route::has($route) ? route($route) :  $route;
+        return Route::has($route) ? route($route) : $route;
     }
 }

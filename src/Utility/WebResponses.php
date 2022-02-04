@@ -2,8 +2,8 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Config;
@@ -21,9 +21,9 @@ class WebResponses implements CrudResponse
         View::share('breadcrumbs', $controller->breadcrumbs);
     }
 
-    public function index($paginate): \Illuminate\Contracts\View\View|Factory|Application
+    public function index(Paginator|Collection $paginate): \Illuminate\Contracts\View\View
     {
-        View::share('pageTitle', __('repository.list').' ' . $this->controller->pageTitle . ' | ' . Config::get('app.name'));
+        View::share('pageTitle', __('repository.list').' '.$this->controller->pageTitle.' | '.Config::get('app.name'));
 
         return view($this->controller->viewIndex, $this->controller->params)
             ->with('entities', $paginate)
@@ -31,17 +31,17 @@ class WebResponses implements CrudResponse
             ->with('filters', $this->controller->request->all());
     }
 
-    public function show($entity): \Illuminate\Contracts\View\View|Factory|Application
+    public function show(Model $entity): \Illuminate\Contracts\View\View
     {
-        View::share('pageTitle', 'View ' . $this->controller->pageTitle . ' | ' . Config::get('app.name'));
+        View::share('pageTitle', 'View '.$this->controller->pageTitle.' | '.Config::get('app.name'));
 
         return view($this->controller->viewShow, $this->controller->params)
             ->with('entity', $entity);
     }
 
-    public function create(): \Illuminate\Contracts\View\View|Factory|Application
+    public function create(): \Illuminate\Contracts\View\View
     {
-        View::share('pageTitle', 'Create ' . $this->controller->pageTitle . ' | ' . Config::get('app.name'));
+        View::share('pageTitle', 'Create '.$this->controller->pageTitle.' | '.Config::get('app.name'));
 
         return view($this->controller->viewCreate, $this->controller->params);
     }
@@ -52,7 +52,7 @@ class WebResponses implements CrudResponse
             ->with('message', __('repository.created_successfully'));
     }
 
-    public function edit(Model $entity): \Illuminate\Contracts\View\View|Factory|Application
+    public function edit(Model $entity): \Illuminate\Contracts\View\View
     {
         return view($this->controller->viewEdit, $this->controller->params)
             ->with('entity', $entity);
@@ -65,7 +65,7 @@ class WebResponses implements CrudResponse
             ->with('updatedCount', $updatedCount);
     }
 
-    public function destroy(int $destroyedCount): RedirectResponse
+    public function destroy(int|bool $destroyedCount): RedirectResponse
     {
         return Redirect::to($this->controller->resolveRoute($this->controller->routeIndex))
             ->with('message', __('repository.deleted_successfully'))

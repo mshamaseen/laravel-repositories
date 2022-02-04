@@ -4,6 +4,8 @@
 
 namespace Shamaseen\Repository\Utility;
 
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,7 +21,7 @@ class APIResponses implements CrudResponse
         $this->controller = $controller;
     }
 
-    public function index($paginate): JsonResponse
+    public function index(Paginator|Collection $paginate): JsonResponse
     {
         $resource = new $this->controller->collectionClass($paginate);
 
@@ -38,7 +40,7 @@ class APIResponses implements CrudResponse
     public function show(EloquentModel $entity): JsonResponse
     {
         /**
-         * @var $resource JsonResource
+         * @var JsonResource $resource
          */
         $resource = new $this->controller->resourceClass($entity);
         $resource->additional = $this->controller->params;
@@ -60,15 +62,14 @@ class APIResponses implements CrudResponse
     public function store(EloquentModel $entity): JsonResponse
     {
         /**
-         * @var $resource JsonResource
+         * @var JsonResource $resource
          */
         $resource = new $this->controller->resourceClass($entity);
 
         return $resource
-            ->additional([
+            ->additional(array_merge([
                 'message' => __('repository.created_successfully'),
-                ...$this->controller->params,
-            ])
+            ], $this->controller->params))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -95,7 +96,7 @@ class APIResponses implements CrudResponse
         );
     }
 
-    public function destroy(int $destroyedCount): JsonResponse
+    public function destroy(int|bool $destroyedCount): JsonResponse
     {
         return response()->json([
             'message' => __('repository.deleted_successfully'),

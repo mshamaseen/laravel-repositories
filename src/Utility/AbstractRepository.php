@@ -57,17 +57,14 @@ abstract class AbstractRepository implements RepositoryInterface
             ->simplePaginate($limit);
     }
 
-    /**
-     * @return Model|null
-     */
-    public function findOrFail(int $id, array $columns = ['*']): ?EloquentModel
+    public function findOrFail(int $id, array $columns = ['*']): EloquentModel
     {
         return $this->getNewBuilderWithScope()
             ->with($this->with)
             ->findOrFail($id, $columns);
     }
 
-    public function create(array $data = []): ?EloquentModel
+    public function create(array $data = []): EloquentModel
     {
         return $this->getNewBuilderWithScope()->create($data);
     }
@@ -122,7 +119,7 @@ abstract class AbstractRepository implements RepositoryInterface
             ->first($columns);
     }
 
-    public function injectDefaultCriteria(&$criteria)
+    public function injectDefaultCriteria(array &$criteria): void
     {
         $criteria['order'] = $criteria['order'] ?? $this->order;
         $criteria['direction'] = $criteria['direction'] ?? $this->direction;

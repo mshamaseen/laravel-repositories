@@ -2,28 +2,23 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Shamaseen\Repository\Interfaces\CrudResponse;
 
 class ResponseDispatcher implements CrudResponse
 {
-    /**
-     * @var APIResponses|WebResponses
-     */
     private WebResponses|APIResponses $dispatcher;
 
     public function __construct(Controller $controller)
     {
-        if (config('repository.responses') === 'api') {
+        if ('api' === config('repository.responses')) {
             $this->dispatcher = (new APIResponses($controller));
-        } elseif (config('repository.responses') === 'web') {
+        } elseif ('web' === config('repository.responses')) {
             $this->dispatcher = (new WebResponses($controller));
         } elseif ($controller->isAPI) {
             $this->dispatcher = (new APIResponses($controller));
@@ -32,26 +27,17 @@ class ResponseDispatcher implements CrudResponse
         }
     }
 
-    /**
-     * @param Paginator|LengthAwarePaginator $paginate
-     * @return View|JsonResponse
-     */
-    public function index($paginate): View|JsonResponse
+    public function index(Paginator|Collection $paginate): View|JsonResponse
     {
         return $this->dispatcher->index($paginate);
     }
 
-    /**
-     * @param Model $entity
-     *
-     * @return View|JsonResponse
-     */
     public function show(Model $entity): View|JsonResponse
     {
         return $this->dispatcher->show($entity);
     }
 
-    public function create(): Factory|View|JsonResponse|Application
+    public function create(): View|JsonResponse
     {
         return $this->dispatcher->create();
     }
@@ -61,7 +47,7 @@ class ResponseDispatcher implements CrudResponse
         return $this->dispatcher->store($entity);
     }
 
-    public function edit(Model $entity): Factory|View|JsonResponse|Application
+    public function edit(Model $entity): View|JsonResponse
     {
         return $this->dispatcher->edit($entity);
     }
@@ -71,7 +57,7 @@ class ResponseDispatcher implements CrudResponse
         return $this->dispatcher->update($updatedCount);
     }
 
-    public function destroy(int $destroyedCount): JsonResponse|RedirectResponse
+    public function destroy(int|bool $destroyedCount): JsonResponse|RedirectResponse
     {
         return $this->dispatcher->destroy($destroyedCount);
     }
