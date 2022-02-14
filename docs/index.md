@@ -1,17 +1,29 @@
-# Welcome to MkDocs
+# Introduction
+This package aim to provide auto file generation and base classes for the repository design pattern on Laravel.
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Repository pattern force you to have repository files in mediate between controllers and models, acting like a container where data access logic and business logic are stored.
 
-## Commands
+### What is wrong with the MVC pattern?
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+MVC Violate the single responsibility principle in SOLID principles, where controller methods are responsible for the business logic and returning responses to the front-end users in the same time, making it impossible to re-use these methods or to independently testing the business logic in them.
 
-## Project layout
+### How repository design pattern works in this package?
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+After a request is being sent to the Laravel application, it follows these steps:
+
+1. The route catch the request and redirect it to its method in the controller
+2. The controller then validate the request with the correct [request file](https://laravel.com/docs/validation#creating-form-requests).
+3. If the validations passed, the controller then check the [policy](https://laravel.com/docs/authorization#creating-policies) authorization if available.
+4. If it passed the controller then call the repository to retrieve the required data.
+5. The repository implement the business logic and call the model to retrieve the required data from the database accordingly.
+6. The repository process that data (if needed) and return the final result to the controller
+7. The controller passes that data to the [resource file](https://laravel.com/docs/eloquent-resources) to format the data as needed.
+8. The controller finally return the response back to the user.
+
+![Repository Pattern Workflow](images/Repository Pattern.png)
+
+### Benefits of this design
+1. Centralization of the data access logic makes code easier to maintain
+2. Business and data access logic can be tested separately
+3. Reduces duplication of code
+4. A lower chance for making programming errors

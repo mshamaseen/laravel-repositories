@@ -1,17 +1,33 @@
-# Welcome to MkDocs
+# Usage
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+### Generate files
+To generate new repository files use this command:
 
-## Commands
+```
+php artisan generate:repository Tests/Test
+```
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+This will generate the following files:
+1. Test #The Model file
+2. TestController
+3. TestRepository
+4. TestRequest
+5. TestResource
+6. TestPolicy
 
-## Project layout
+If you are using another architecture than the one Laravel uses (let us say you are using modular architecture) you can pass the base path to your files like this:
+```
+php artisan generate:repository Test --base=app/Modules
+```
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+This will generate the files inside the app/Modules directory and will set the namespace accordingly. 
+
+!!! note
+
+    See the config file for more information about paths.
+
+### Remove files
+To remove repository files use the following command:
+```
+php artisan ungenerate:repository Tests/Test
+```

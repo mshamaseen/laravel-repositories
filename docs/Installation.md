@@ -1,17 +1,20 @@
-# Welcome to MkDocs
+#Installation
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Via composer:
+```composer
+composer require shamaseen/laravel-repositories
+```
 
-## Commands
+Then publish the repository config
+```
+php artisan vendor:publish --tag=repository-stubs
+```
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+**Optional:** to publish the stubs files
+```
+php artisan vendor:publish --tag=repository-stubs --force
+```
 
-## Project layout
+!!! note "  Forcing the stub files"
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+    Unless you have made your own changes on the stub files, you should always force the publish

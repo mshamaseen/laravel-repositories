@@ -1,2 +1,26 @@
-site_name: My Docs
-site_url: https://example.com/
+site_name: Laravel Repository Pattern Documentation
+site_url: ""
+use_directory_urls: false
+repo_url: https://github.com/mshamaseen/laravel-repositories
+site_author: Mohammad AlShamaseen
+copyright: MIT License
+nav:
+  - Introduction: index.md
+  - Installation: Installation.md
+  - Usage: Usage.md
+  - Base Files:
+      - Introduction: Base/Introduction.md
+      - Model: Base/Model.md
+      - Controller: Base/Controller.md
+      - AbstractRepository: Base/AbstractRepository.md
+      - Request: Base/Request.md
+      - Resource: Base/Resource.md
+      - Policy: Base/Policy.md
+theme:
+  name: readthedocs
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: "#"
+
+extra_css: [extra.css]
