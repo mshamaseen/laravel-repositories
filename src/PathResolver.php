@@ -98,6 +98,12 @@ class PathResolver
      */
     public function getStubPath(string $type): string
     {
+        $configStub = realpath(Config::get('repository.stubs_path')."/$type.stub");
+
+        if (!$configStub) {
+            return __DIR__."/stubs/$type.stub";
+        }
+
         return Config::get('repository.stubs_path')."/$type.stub";
     }
 }

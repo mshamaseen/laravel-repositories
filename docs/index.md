@@ -1,7 +1,7 @@
 # Introduction
 This package aim to provide auto file generation and base classes for the repository design pattern on Laravel.
 
-Repository pattern force you to have repository files in mediate between controllers and models, acting like a container where data access logic and business logic are stored.
+Repository pattern forces you to have repository files in mediate between controllers and models, acting like a container where data access logic and business logic are stored.
 
 ### What is wrong with the MVC pattern?
 

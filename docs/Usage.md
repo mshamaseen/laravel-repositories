@@ -1,6 +1,6 @@
 # Usage
 
-### Generate files
+## Generate files
 To generate new repository files use this command:
 
 ```
@@ -26,8 +26,22 @@ This will generate the files inside the app/Modules directory and will set the n
 
     See the config file for more information about paths.
 
-### Remove files
+## Remove files
 To remove repository files use the following command:
 ```
 php artisan ungenerate:repository Tests/Test
 ```
+
+
+## Event
+
+Whenever this package generates new files it will emit `Shamaseen\Repository\Events\RepositoryFilesGenerated` event, so that you can hook it to generate even more files (let us says view files) or do other stuff.
+
+For example, to generate view files with the repository files create a new event listener, register it under `RepositoryFilesGenerated` event, and add this to your handler:
+
+```php
+\FilesGenerator::stub(resource_path('stubs/view/create.blade.php'))
+            ->output(resource_path('views/create.blade.php'));
+```
+
+This will generate a new file from your custom stub whenever repository files are generated.
