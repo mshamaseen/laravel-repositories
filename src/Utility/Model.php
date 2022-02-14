@@ -3,7 +3,7 @@
 namespace Shamaseen\Repository\Utility;
 
 use Eloquent;
-use \Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Shamaseen\Repository\Utility\Models\CachePerRequest;
 use Shamaseen\Repository\Utility\Models\Criteriable;
 
@@ -11,6 +11,7 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
  * App\Entities\BaseEntity.
  *
  * @property array $searchable
+ *
  * @method static Builder orderByCriteria()
  * @method static Builder searchByCriteria()
  * @method static Builder filterByCriteria()

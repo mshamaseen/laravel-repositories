@@ -7,7 +7,8 @@ use Illuminate\Queue\SerializesModels;
 
 class RepositoryFilesRemoved
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     public string $path;
     public string $modelName;

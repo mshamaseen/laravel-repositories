@@ -26,11 +26,8 @@ class Request extends FormRequest
 
     /**
      * Define all the global rules for this request here.
-     *
-     * @var array
      */
     protected array $rules = [
-
     ];
 
     public function rules(): array
@@ -50,8 +47,8 @@ class Request extends FormRequest
         if ($route) {
             $routeName = $route->action['uses'];
             if ($routeName) {
-                $lastPart = last(explode("@", $routeName));
-                $validatorName = $lastPart."Rules";
+                $lastPart = last(explode('@', $routeName));
+                $validatorName = $lastPart.'Rules';
 
                 $reflection = new \ReflectionClass($this);
                 // make sure the method is exists in the user defined request
@@ -66,8 +63,6 @@ class Request extends FormRequest
 
     /**
      * Define all the rules for every get HTTP method on this request.
-     *
-     * @return array
      */
     public function getMethodRules(): array
     {
@@ -76,8 +71,6 @@ class Request extends FormRequest
 
     /**
      * Define all the rules for every post HTTP method on this request.
-     *
-     * @return array
      */
     public function postMethodRules(): array
     {
@@ -86,8 +79,6 @@ class Request extends FormRequest
 
     /**
      * Define all the rules for every patch HTTP method on this request.
-     *
-     * @return array
      */
     public function patchMethodRules(): array
     {
@@ -96,8 +87,6 @@ class Request extends FormRequest
 
     /**
      * Define all the rules for every put HTTP method on this request.
-     *
-     * @return array
      */
     public function putMethodRules(): array
     {
@@ -106,8 +95,6 @@ class Request extends FormRequest
 
     /**
      * Define all the rules for every delete HTTP method on this request.
-     *
-     * @return array
      */
     public function deleteMethodRules(): array
     {

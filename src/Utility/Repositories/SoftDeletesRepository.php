@@ -4,21 +4,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait SoftDeletesRepository
 {
-    /**
-     * @param int $id
-     *
-     * @return bool
-     */
     public function restore(int $id): bool
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->restore();
     }
 
-    /**
-     * @param int $id
-     *
-     * @return bool
-     */
     public function forceDelete(int $id): bool
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->forceDelete();

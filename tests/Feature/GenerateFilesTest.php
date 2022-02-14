@@ -2,8 +2,8 @@
 
 namespace Shamaseen\Repository\Tests\Feature;
 
-use Shamaseen\Repository\Tests\TestCase;
 use Shamaseen\Repository\PathResolver;
+use Shamaseen\Repository\Tests\TestCase;
 
 class GenerateFilesTest extends TestCase
 {
@@ -16,11 +16,8 @@ class GenerateFilesTest extends TestCase
 
     protected string $modelName = 'Test';
     protected string $userPath = 'Tests';
+
     /**
-     * Some
-     *
-     * @param string|null $name
-     * @param array $data
      * @param string $dataName
      */
     public function __construct(?string $name = null, array $data = [], $dataName = '')

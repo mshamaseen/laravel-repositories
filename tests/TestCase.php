@@ -10,8 +10,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected array $configs = [
         'repository.base_path' => 'app',
-        'repository.stubs_path' => __DIR__ . '/results/resources/stubs',
-        'repository.lang_path' => __DIR__ . '/results/resources/lang',
+        'repository.stubs_path' => __DIR__.'/results/resources/stubs',
+        'repository.lang_path' => __DIR__.'/results/resources/lang',
         'repository.controllers_path' => 'Http/Controllers',
         'repository.repositories_path' => 'Repositories',
         'repository.models_path' => 'Models',
@@ -22,7 +22,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->app->setBasePath(realpath(__DIR__ . '/results'));
+        $this->app->setBasePath(realpath(__DIR__.'/results'));
         $this->alterConfig();
         $this->makePathIfNotExist(config('repository.stubs_path'));
         $this->makePathIfNotExist(config('repository.lang_path'));
@@ -49,17 +49,17 @@ class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     /**
-     * Using `vendor:publish --tag="repository-stubs"` didn't work as the test config path is not set yet
+     * Using `vendor:publish --tag="repository-stubs"` didn't work as the test config path is not set yet.
      */
     public function publishStubs()
     {
-        $iterator = new FilesystemIterator(__DIR__."/../src/stubs");
+        $iterator = new FilesystemIterator(__DIR__.'/../src/stubs');
         foreach ($iterator as $i) {
             /**
              * @var DirectoryIterator $i
              */
             if ($i->isFile()) {
-                copy($i->getPathname(), $this->configs['repository.stubs_path']."/".$i->getFilename());
+                copy($i->getPathname(), $this->configs['repository.stubs_path'].'/'.$i->getFilename());
             }
         }
     }

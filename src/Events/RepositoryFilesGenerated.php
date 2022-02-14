@@ -7,7 +7,8 @@ use Illuminate\Queue\SerializesModels;
 
 class RepositoryFilesGenerated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     protected string $userPath;
     protected string $basePath;

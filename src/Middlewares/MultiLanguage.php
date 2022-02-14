@@ -11,8 +11,6 @@ class MultiLanguage
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -22,8 +20,8 @@ class MultiLanguage
         if (!$preferred) {
             $configLocale = config('app.locale');
 
-            $browserLanguage = isset($_SERVER["HTTP_ACCEPT_LANGUAGE"]) && $_SERVER["HTTP_ACCEPT_LANGUAGE"]
-                ? $_SERVER["HTTP_ACCEPT_LANGUAGE"]
+            $browserLanguage = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $_SERVER['HTTP_ACCEPT_LANGUAGE']
+                ? $_SERVER['HTTP_ACCEPT_LANGUAGE']
                 : $configLocale;
             $preferred = $this->preferredLanguage(config('app.locales', [$configLocale]), $browserLanguage);
 
@@ -38,8 +36,8 @@ class MultiLanguage
     /**
      * Detect the preferred language form the user browser setting.
      *
-     * @param array $available_languages
      * @param $http_accept_language
+     *
      * @return int|string
      */
     public function preferredLanguage(array $available_languages, $http_accept_language)
@@ -49,7 +47,7 @@ class MultiLanguage
         $langs = [];
         preg_match_all('~([\w-]+)(?:[^,\d]+([\d.]+))?~', strtolower($http_accept_language), $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
-            list($a, $b) = explode('-', $match[1]) + array('', '');
+            list($a, $b) = explode('-', $match[1]) + ['', ''];
 
             $value = isset($match[2]) ? (float) $match[2] : 1.0;
 
@@ -64,6 +62,6 @@ class MultiLanguage
         }
         arsort($langs);
 
-        return array_keys($langs)[0] ?? "en";
+        return array_keys($langs)[0] ?? 'en';
     }
 }

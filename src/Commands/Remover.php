@@ -46,7 +46,6 @@ class Remover extends Command
 
     /**
      * Execute the console command.
-     *
      */
     public function handle()
     {
@@ -60,7 +59,7 @@ class Remover extends Command
         // Configure the generator
         config(['generator.base_path' => base_path($this->basePath)]);
 
-        if (!$this->option('force') && !$this->confirm('This will delete ' . $this->modelName . ' files and folder, Do you want to continue ?')) {
+        if (!$this->option('force') && !$this->confirm('This will delete '.$this->modelName.' files and folder, Do you want to continue ?')) {
             return false;
         }
 
