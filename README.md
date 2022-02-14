@@ -24,10 +24,11 @@ This will generate the following files:
 5. TestResource
 6. TestPolicy
 
-
 Read the full document on [ReadTheDoc](https://laravel-repository-pattern.readthedocs.io/en/latest/index.html).
-
 
 ## LICENSE
 MIT License
 
+
+## Versioning
+We follow [Semantic Versioning](https://semver.org/)

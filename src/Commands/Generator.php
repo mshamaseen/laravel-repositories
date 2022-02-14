@@ -22,7 +22,8 @@ class Generator extends Command
     protected $signature = 'generate:repository
     {name : Class (singular) for example User}
     {--base= : Base path to inject the files\folders in}
-    {--f|force : force overwrite files}';
+    {--f|force : force overwrite files}
+    {--no-override : don\'t override any file}';
 
     protected $description = 'Create repository files';
 
@@ -53,7 +54,7 @@ class Generator extends Command
         if (!$paths) {
             $this->error('Name argument is not correct.');
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         $this->modelName = array_pop($paths);
@@ -89,7 +90,7 @@ class Generator extends Command
 
         $this->dumpAutoload();
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     /**
@@ -99,8 +100,8 @@ class Generator extends Command
     {
         $outputPath = $this->pathResolver->outputPath($type);
 
-        if (!$this->option('force') && $realpath = realpath($outputPath)) {
-            if (!$this->confirm('File '.$realpath.' is exist, do you want to overwrite it?')) {
+        if (!$this->option('force') && $realpath = realpath($this->generator->absolutePath($outputPath))) {
+            if ($this->option('no-override') || !$this->confirm('File '.$realpath.' is exist, do you want to overwrite it?')) {
                 return false;
             }
         }
