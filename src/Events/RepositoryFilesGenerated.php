@@ -10,8 +10,8 @@ class RepositoryFilesGenerated
     use Dispatchable;
     use SerializesModels;
 
-    protected string $userPath;
-    protected string $basePath;
+    public string $userPath;
+    public string $basePath;
     public string $modelName;
 
     /**
