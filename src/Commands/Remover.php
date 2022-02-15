@@ -47,7 +47,7 @@ class Remover extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->userPaths = preg_split(' ([/\\\]) ', $this->argument('name'));
 
@@ -69,12 +69,13 @@ class Remover extends Command
         $this->remove('Repository');
         $this->remove('Resource');
         $this->remove('Collection');
+        $this->remove('Policy');
 
         RepositoryFilesRemoved::dispatch($this->basePath, $this->userPath, $this->modelName);
 
         $this->dumpAutoload();
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     public function remove($type): bool
@@ -86,7 +87,7 @@ class Remover extends Command
         }
 
         $pathsToDelete = count($this->userPaths);
-        for ($i = 0; $i < $pathsToDelete; $i++) {
+        for ($i = 0; $i < $pathsToDelete; ++$i) {
             $pathFromBase = $this->ungenerator->absolutePath(
                 $this->pathResolver->directionFromBase($type)
             );
