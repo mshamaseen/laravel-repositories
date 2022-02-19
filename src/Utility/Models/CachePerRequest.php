@@ -44,4 +44,9 @@ trait CachePerRequest
     {
         return 'repository-cache';
     }
+
+    public function getConnection()
+    {
+        return new ConnectionProxy(static::resolveConnection($this->getConnectionName()), $this);
+    }
 }
