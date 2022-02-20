@@ -4,9 +4,7 @@ Models are the middleware between the application and the database, you should d
 
 ## Request Cache
 
-Request cache allow you to cache specific method results for the current request, it uses the **array** driver to cache the results per each request.
-
-you can specify which method result to cache by override the `$methodsToCache` static property.
+Request cache allow you to cache queries results for the current request, it uses the **array** driver to cache the results per each request.
 
 You can disable caching for the current model by setting the `$requestCacheEnabled` property to false.
 
