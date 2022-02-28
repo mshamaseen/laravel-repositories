@@ -76,21 +76,28 @@ class APIResponses implements CrudResponse
 
     public function edit(EloquentModel $entity): JsonResponse
     {
-        return response()->json(
-            [
-                'message' => __('repository.no_content'),
-                'data' => $this->controller->params,
-            ],
-            Response::HTTP_NO_CONTENT
-        );
+        // Same as the show
+        return $this->show($entity);
     }
 
     public function update(int|bool|EloquentModel $updatedCount): JsonResponse
     {
+        $data = $this->controller->params;
+
+        if ($updatedCount instanceof EloquentModel) {
+            /**
+             * @var JsonResource $resource
+             */
+            $resource = new $this->controller->resourceClass($updatedCount);
+            $resource->additional = $this->controller->params;
+
+            $data = $resource;
+        }
+
         return response()->json(
             [
                 'message' => __('repository.modified_successfully'),
-                'data' => $this->controller->params,
+                'data' => $data,
             ],
             Response::HTTP_OK
         );
