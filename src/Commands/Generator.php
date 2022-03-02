@@ -110,12 +110,13 @@ class Generator extends Command
         $lcModelName = Str::lower($this->modelName);
         $lcPluralModelName = Str::plural($lcModelName);
         $snackLcPluralModelName = Str::snake($this->modelName);
+        $webViewProperties = $this->isWebResponseAllowed() ? $this->getViewControllerProperties($lcPluralModelName) : '';
 
         $this->generator->stub($this->pathResolver->getStubPath($type))
             ->replace('{{parentClass}}', $parentClass)
             ->replace('{{modelName}}', $this->modelName)
             ->replace('{{lcModelName}}', $lcModelName)
-            ->replace('{{lcPluralModelName}}', $lcPluralModelName)
+            ->replace('{{viewProperties}}', $webViewProperties)
             ->replace('{{snackLcPluralModelName}}', $snackLcPluralModelName)
             ->replace('{{namespace}}', $namespace)
             ->replace('{{RequestsNamespace}}', $this->pathResolver->typeNamespace('Request'))
@@ -128,8 +129,28 @@ class Generator extends Command
         return true;
     }
 
+    public function getViewControllerProperties($lcPluralModelName): string
+    {
+        return str_replace('{{lcPluralModelName}}', $lcPluralModelName, <<<'EOD'
+
+            public string $routeIndex = '{{lcPluralModelName}}.index';
+            public string $createRoute = '{{lcPluralModelName}}.create';
+
+            public string $viewIndex = '{{lcPluralModelName}}.index';
+            public string $viewCreate = '{{lcPluralModelName}}.create';
+            public string $viewEdit = '{{lcPluralModelName}}.edit';
+            public string $viewShow = '{{lcPluralModelName}}.show';
+
+        EOD);
+    }
+
     private function dumpAutoload()
     {
         shell_exec('composer dump-autoload');
+    }
+
+    private function isWebResponseAllowed(): bool
+    {
+        return in_array(config('repository.responses', 'both'), ['both', 'web']);
     }
 }
