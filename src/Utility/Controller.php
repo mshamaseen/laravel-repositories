@@ -116,9 +116,6 @@ class Controller extends LaravelController
             }
         }
 
-        $this->request->offsetUnset('only-trash');
-        $this->request->offsetUnset('with-trash');
-        $this->request->offsetUnset('limit');
         $this->responseDispatcher = new ResponseDispatcher($this);
 
         return parent::callAction($method, $parameters);
@@ -135,9 +132,9 @@ class Controller extends LaravelController
         ]);
 
         if ('simple' === $this->paginateType) {
-            $paginate = $this->repository->simplePaginate($this->limit, $this->request->all());
+            $paginate = $this->repository->simplePaginate($this->limit, $this->request->validated());
         } else {
-            $paginate = $this->repository->paginate($this->limit, $this->request->all());
+            $paginate = $this->repository->paginate($this->limit, $this->request->validated());
         }
 
         return $this->responseDispatcher->index($paginate);
@@ -176,7 +173,7 @@ class Controller extends LaravelController
      */
     public function store(): JsonResponse|RedirectResponse
     {
-        $entity = $this->repository->create($this->request->except(['_token', '_method']));
+        $entity = $this->repository->create($this->request->validated());
 
         return $this->responseDispatcher->store($entity);
     }
@@ -201,7 +198,7 @@ class Controller extends LaravelController
      */
     public function update(int $entityId): JsonResponse|RedirectResponse
     {
-        $updatedCount = $this->repository->update($entityId, $this->request->except(['_token', '_method']));
+        $updatedCount = $this->repository->update($entityId, $this->request->validated());
 
         return $this->responseDispatcher->update($updatedCount);
     }
