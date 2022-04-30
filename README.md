@@ -32,3 +32,6 @@ MIT License
 
 ## Versioning
 We follow [Semantic Versioning](https://semver.org/)
+
+## Roadmap
+1. add the ability to disable caching from the config.
