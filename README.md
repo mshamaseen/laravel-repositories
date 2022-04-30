@@ -35,3 +35,4 @@ We follow [Semantic Versioning](https://semver.org/)
 
 ## Roadmap
 1. add the ability to disable caching from the config.
+2. stop caching automatically when calling model refresh
