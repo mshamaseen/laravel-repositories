@@ -25,8 +25,8 @@ return [
     'model_parent' => 'Shamaseen\Repository\Utility\Model',
     'repository_parent' => 'Shamaseen\Repository\Utility\AbstractRepository',
     'request_parent' => 'Shamaseen\Repository\Utility\Request',
-    'resource_parent' => 'Illuminate\Http\Resources\Json\JsonResource',
-    'collection_parent' => 'Illuminate\Http\Resources\Json\ResourceCollection',
+    'resource_parent' => 'Shamaseen\Repository\Utility\Resource',
+    'collection_parent' => 'Shamaseen\Repository\Utility\ResourceCollection',
 
     /*
      * Available options:

@@ -19,7 +19,8 @@
     "autoload": {
         "psr-4": {
             "Shamaseen\\Repository\\Tests\\": "tests/",
-            "Shamaseen\\Repository\\": "src/"
+            "Shamaseen\\Repository\\": "src/",
+            "App\\": "tests/results/app/"
         }
     },
     "minimum-stability": "stable",

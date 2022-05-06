@@ -2,12 +2,14 @@
 
 namespace Shamaseen\Repository\Tests;
 
+use App\Models\Tests\Test;
 use DirectoryIterator;
 use FilesystemIterator;
 use Shamaseen\Repository\RepositoryServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
+    // Shamaseen\Repository\Tests\results\app
     protected array $configs = [
         'repository.base_path' => 'app',
         'repository.stubs_path' => __DIR__.'/results/resources/stubs',
@@ -44,7 +46,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function makePathIfNotExist($path)
     {
         if (!is_dir($path)) {
-            mkdir($path, 775, true);
+            mkdir($path, 0775, true);
         }
     }
 
@@ -62,6 +64,12 @@ class TestCase extends \Orchestra\Testbench\TestCase
                 copy($i->getPathname(), $this->configs['repository.stubs_path'].'/'.$i->getFilename());
             }
         }
+
+        // change fillable to guarded for the next test.
+        $path = 'tests/results/resources/stubs/Model.stub';
+        $modelContent = file_get_contents($path);
+        $modelContent = str_replace('$fillable', '$guarded', $modelContent);
+        file_put_contents($path, $modelContent);
     }
 
     public function alterConfig()

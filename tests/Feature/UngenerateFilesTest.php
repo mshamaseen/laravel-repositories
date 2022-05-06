@@ -2,11 +2,10 @@
 
 namespace Shamaseen\Repository\Tests\Feature;
 
-use App\Models\Tests\Test;
 use Shamaseen\Repository\PathResolver;
 use Shamaseen\Repository\Tests\TestCase;
 
-class GenerateFilesTest extends TestCase
+class UngenerateFilesTest extends TestCase
 {
     /**
      * @var mixed
@@ -32,14 +31,14 @@ class GenerateFilesTest extends TestCase
         $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
 
-    public function test_generate()
+    public function test_ungenerate()
     {
-        $this->artisan("generate:repository $this->userPath/$this->modelName -f");
+        $this->artisan("ungenerate:repository $this->userPath/$this->modelName")
+            ->expectsConfirmation('This will delete Test files and folder, Do you want to continue ?', 'yes');
 
         foreach ($this->filesToGenerate as $type) {
-            $absolutePath = $this->pathResolver->absolutePath($type);
-
-            $this->assertFileExists($absolutePath);
+            $outputPath = $this->pathResolver->absolutePath($type);
+            $this->assertFileDoesNotExist($outputPath);
         }
     }
 }
