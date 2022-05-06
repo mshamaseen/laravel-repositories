@@ -8,17 +8,16 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 use Psr\SimpleCache\InvalidArgumentException;
+use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Shamaseen\Repository\Utility\Model;
 
 class ConnectionProxy implements ConnectionInterface
 {
     public Connection $realConnection;
-    private Model $model;
 
-    public function __construct(Connection $realConnection, Model $model)
+    public function __construct(Connection $realConnection,private Model|LaravelModel $model)
     {
         $this->realConnection = $realConnection;
-        $this->model = $model;
     }
 
     // Proxy methods >>>
