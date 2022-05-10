@@ -17,7 +17,7 @@ php artisan generate:repository Test
 ```
 
 This will generate the following files:
-1. Test #The Model file
+1. Test - (the Model file)
 2. TestController
 3. TestRepository
 4. TestRequest

@@ -12,9 +12,9 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
  *
  * @property array $searchable
  *
- * @method static Builder orderByCriteria()
- * @method static Builder searchByCriteria()
- * @method static Builder filterByCriteria()
+ * @method static Builder orderByCriteria($criteria)
+ * @method static Builder searchByCriteria($criteria)
+ * @method static Builder filterByCriteria($criteria)
  * @method static Builder whereId($value)
  * @method static Builder newModelQuery()
  * @method static Builder newQuery()

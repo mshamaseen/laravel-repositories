@@ -8,6 +8,10 @@ trait Criteriable
 {
     protected ?array $searchables = null;
     protected ?array $filterable = null;
+    /**
+     * @var array<array<string>>
+     */
+    protected ?array $fulltextSearch = [];
 
     public function scopeFilterByCriteria($query, array $criteria): Builder
     {
@@ -37,6 +41,11 @@ trait Criteriable
     {
         if (isset($criteria['search'])) {
             $query->where(function ($q) use ($criteria) {
+                foreach ((array) $this->fulltextSearch as $pair) {
+                    $q->orWhereRaw(sprintf("match(%s) against('%s')",
+                        implode(',', $pair), $criteria['search']));
+                }
+
                 /*
                  * @var Builder $q
                  */
@@ -47,12 +56,12 @@ trait Criteriable
                             $query->where(function ($query2) use ($criteria, $columns) {
                                 /* @var $query2 Builder */
                                 foreach ((array) $columns as $column) {
-                                    $query2->orWhere($column, 'like', '%'.$criteria['search'].'%');
+                                    $query2->orWhere($column, 'like', $criteria['search'].'%');
                                 }
                             });
                         });
                     } else {
-                        $q->orWhere($columns, 'like', '%'.$criteria['search'].'%');
+                        $q->orWhere($columns, 'like', $criteria['search'].'%');
                     }
                 }
             });
