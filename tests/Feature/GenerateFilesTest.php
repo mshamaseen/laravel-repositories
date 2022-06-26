@@ -31,7 +31,7 @@ class GenerateFilesTest extends TestCase
         $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
 
-    public function test_generate()
+    public function testGenerate()
     {
         $this->artisan("generate:repository $this->userPath/$this->modelName");
 
@@ -42,7 +42,7 @@ class GenerateFilesTest extends TestCase
         }
     }
 
-    public function test_ungenerate()
+    public function testUngenerate()
     {
         $this->artisan("ungenerate:repository $this->userPath/$this->modelName")
             ->expectsConfirmation('This will delete Test files and folder, Do you want to continue ?', 'yes');
