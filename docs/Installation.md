@@ -7,7 +7,7 @@ composer require shamaseen/laravel-repositories
 
 Then publish the repository config
 ```
-php artisan vendor:publish --tag=repository-stubs
+php artisan vendor:publish --tag=repository
 ```
 
 **Optional:** to publish the stubs files
