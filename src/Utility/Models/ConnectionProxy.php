@@ -15,7 +15,7 @@ class ConnectionProxy implements ConnectionInterface
 {
     public Connection $realConnection;
 
-    public function __construct(Connection $realConnection,private Model|LaravelModel $model)
+    public function __construct(Connection $realConnection, private readonly Model|LaravelModel $model)
     {
         $this->realConnection = $realConnection;
     }
@@ -168,7 +168,7 @@ class ConnectionProxy implements ConnectionInterface
 
     public function __call(string $name, array $arguments)
     {
-        return $this->realConnection->{$name}($arguments);
+        return $this->realConnection->{$name}(...$arguments);
     }
 
     /**
