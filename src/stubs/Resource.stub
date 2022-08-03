@@ -5,10 +5,12 @@ namespace {{namespace}};
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use JsonSerializable;
+use {{ModelNamespace}}\{{modelName}};
 use {{parentClass}} as JsonResource;
 
 /**
  * Class {{modelName}}Resource.
+ * @mixin {{modelName}}
  */
 class {{modelName}}Resource extends JsonResource
 {
@@ -16,7 +18,7 @@ class {{modelName}}Resource extends JsonResource
      * Transform the resource into an array.
      *
      * @param Request $request
-     * @return array|Arrayable|JsonSerializable
+     * @return array|Arrayable<string, mixed>|JsonSerializable
      */
     public function toArray($request): array|Arrayable|JsonSerializable
     {
