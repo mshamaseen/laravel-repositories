@@ -7,7 +7,7 @@ They act exactly the same way as [Laravel policy](https://laravel.com/docs/autho
 For example, to validate a method called `documents` in the controller, all you need to do is to make another method called `documents` in the policy file.
 
 ```
-function policy(?User $user)
+function documents(?User $user)
 {
     // your authorization logic here.
 }
