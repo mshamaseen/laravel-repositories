@@ -24,7 +24,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     protected string $direction = 'desc';
 
-    protected array $with = [];
+    public array $with = [];
 
     private array $scopes = [];
 
