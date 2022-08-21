@@ -8,6 +8,9 @@ trait Criteriable
 {
     protected ?array $searchables = null;
     protected ?array $filterable = null;
+    protected ?array $sortables = null;
+
+
     /**
      * @var array<array<string>>
      */
@@ -72,7 +75,7 @@ trait Criteriable
 
     public function scopeOrderByCriteria($query, array $criteria): Builder
     {
-        if (isset($criteria['order'])) {
+        if (isset($criteria['order']) && in_array($criteria['order'], $this->getSortables())) {
             $query->orderBy($criteria['order'], $criteria['direction'] ?? 'desc');
         }
 
@@ -87,6 +90,18 @@ trait Criteriable
     {
         if (null !== $this->searchables) {
             return $this->searchables;
+        }
+
+        return array_diff($this->getFillable(), $this->getHidden());
+    }
+
+    /**
+     * By default, all fillables and not hidden are sortables, if you want to override that explicitly set an array of sortables.
+     */
+    public function getSortables(): array
+    {
+        if (null !== $this->sortables) {
+            return $this->sortables;
         }
 
         return array_diff($this->getFillable(), $this->getHidden());
