@@ -25,49 +25,49 @@ class CrudTest extends TestCase
         parent::setUp();
     }
 
-    public function test_index()
+    public function testIndex()
     {
         Route::get('tests', [\App\Http\Controllers\Tests\TestController::class, 'index']);
 
         $response = $this->getJson('tests');
         $this->assertContains($response->getStatusCode(), [
-            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
         ]);
     }
 
-    public function test_show()
+    public function testShow()
     {
         Route::get('tests/{id}', [\App\Http\Controllers\Tests\TestController::class, 'show']);
 
         $response = $this->getJson('tests/1');
 
         $this->assertContains($response->getStatusCode(), [
-            Response::HTTP_OK
+            Response::HTTP_OK,
         ]);
     }
 
-    public function test_create()
+    public function testCreate()
     {
         Route::get('tests/create', [\App\Http\Controllers\Tests\TestController::class, 'create']);
 
         $response = $this->getJson('tests/create');
         $this->assertContains($response->getStatusCode(), [
-            Response::HTTP_NO_CONTENT
+            Response::HTTP_NO_CONTENT,
         ]);
     }
 
-    public function test_store()
+    public function testStore()
     {
         Route::post('tests', [\App\Http\Controllers\Tests\TestController::class, 'store']);
 
         $data = [
             'name' => 'Create Test',
-            'type' => 'New'
+            'type' => 'New',
         ];
 
         $response = $this->postJson('tests', $data);
         $this->assertContains($response->getStatusCode(), [
-            Response::HTTP_CREATED
+            Response::HTTP_CREATED,
         ]);
 
         $content = json_decode($response->getContent())->data;
@@ -75,25 +75,26 @@ class CrudTest extends TestCase
         $test = Test::findOrFail($content->id);
         $this->assertEquals($data['name'], $test->name);
         $this->assertEquals($data['type'], $test->type);
+
         return $content->id;
     }
 
     /**
-     * @depends test_store
+     * @depends testStore
      */
-    public function test_update(int $id)
+    public function testUpdate(int $id)
     {
         Route::put('tests/{id}', [\App\Http\Controllers\Tests\TestController::class, 'update']);
 
         $data = [
             'name' => 'Update Test',
-            'type' => 'Updated'
+            'type' => 'Updated',
         ];
 
         $response = $this->putJson('tests/'.$id, $data);
 
         $this->assertContains($response->getStatusCode(), [
-            Response::HTTP_OK
+            Response::HTTP_OK,
         ]);
 
         $test = Test::findOrFail($id);
@@ -102,15 +103,15 @@ class CrudTest extends TestCase
     }
 
     /**
-     * @depends test_store
+     * @depends testStore
      */
-    public function test_delete(int $id)
+    public function testDelete(int $id)
     {
         Route::delete('tests/{id}', [\App\Http\Controllers\Tests\TestController::class, 'destroy']);
 
         $response = $this->deleteJson('tests/'.$id);
         $this->assertContains($response->getStatusCode(), [
-            Response::HTTP_OK
+            Response::HTTP_OK,
         ]);
     }
 }

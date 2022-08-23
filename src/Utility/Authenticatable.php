@@ -2,8 +2,8 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use Illuminate\Foundation\Auth\User as LaravelUser;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\User as LaravelUser;
 use Shamaseen\Repository\Utility\Models\CachePerRequest;
 use Shamaseen\Repository\Utility\Models\Criteriable;
 

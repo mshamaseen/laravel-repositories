@@ -31,7 +31,7 @@ class UngenerateFilesTest extends TestCase
         $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
 
-    public function test_ungenerate()
+    public function testUngenerate()
     {
         $this->artisan("ungenerate:repository $this->userPath/$this->modelName")
             ->expectsConfirmation('This will delete Test files and folder, Do you want to continue ?', 'yes');

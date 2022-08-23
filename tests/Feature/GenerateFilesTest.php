@@ -2,7 +2,6 @@
 
 namespace Shamaseen\Repository\Tests\Feature;
 
-use App\Models\Tests\Test;
 use Shamaseen\Repository\PathResolver;
 use Shamaseen\Repository\Tests\TestCase;
 
@@ -32,7 +31,7 @@ class GenerateFilesTest extends TestCase
         $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
 
-    public function test_generate()
+    public function testGenerate()
     {
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");
 
