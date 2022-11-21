@@ -10,7 +10,7 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
 /**
  * App\Entities\BaseEntity.
  *
- * @property array $searchable
+ * @property array $searchables
  *
  * @method static Builder orderByCriteria()
  * @method static Builder searchByCriteria()
