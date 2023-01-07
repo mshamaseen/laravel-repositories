@@ -40,7 +40,6 @@ class RepositoryServiceProvider extends ServiceProvider
         // stubs
         $this->publishes([
             realpath(__DIR__.'/stubs') => $config['stubs_path'],
-            __DIR__.'/lang' => $config['lang_path'].'/en',
         ], 'repository-stubs');
     }
 
