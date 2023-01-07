@@ -10,7 +10,6 @@ trait Criteriable
     protected ?array $filterable = null;
     protected ?array $sortables = null;
 
-
     /**
      * @var array<array<string>>
      */

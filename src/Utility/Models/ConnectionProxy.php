@@ -5,10 +5,10 @@ namespace Shamaseen\Repository\Utility\Models;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 use Psr\SimpleCache\InvalidArgumentException;
-use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Shamaseen\Repository\Utility\Model;
 
 class ConnectionProxy implements ConnectionInterface
