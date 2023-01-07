@@ -1,0 +1,12 @@
+<?php
+
+namespace {{namespace}};
+
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class {{modelName}}Policy
+{
+    use HandlesAuthorization;
+
+    // Any method here that match the controller method name will be automatically called.
+}
