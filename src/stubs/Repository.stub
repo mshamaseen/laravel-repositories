@@ -7,7 +7,7 @@ use {{ModelNamespace}}\{{modelName}};
 /**
  * Class {{modelName}}Repository.
  *
- * @property {{modelName}} $model
+ * @extends AbstractRepository<{{modelName}}>
  */
 class {{modelName}}Repository extends AbstractRepository
 {

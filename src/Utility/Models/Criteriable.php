@@ -4,6 +4,11 @@ namespace Shamaseen\Repository\Utility\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @method static Builder filterByCriteria(array $criteria)
+ * @method static Builder searchByCriteria(array $criteria)
+ * @method static Builder orderByCriteria(array $criteria)
+ */
 trait Criteriable
 {
     protected ?array $searchables = null;

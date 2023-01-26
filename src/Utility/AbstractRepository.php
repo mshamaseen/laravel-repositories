@@ -10,15 +10,17 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\App;
 
 /**
  * Class Database.
+ *
+ * @template TModel of Model
  */
 abstract class AbstractRepository implements RepositoryInterface
 {
-    public EloquentModel $model;
+    /** @var TModel */
+    public Model $model;
 
     protected ?string $order = null;
 
@@ -33,8 +35,10 @@ abstract class AbstractRepository implements RepositoryInterface
         $this->model = App::make($this->getModelClass());
     }
 
+    /** @return class-string<TModel> */
     abstract public function getModelClass(): string;
 
+    /** @return LengthAwarePaginator<TModel> */
     public function paginate(int $limit = 10, array $criteria = []): LengthAwarePaginator
     {
         $this->injectDefaultCriteria($criteria);
@@ -47,6 +51,7 @@ abstract class AbstractRepository implements RepositoryInterface
             ->paginate($limit);
     }
 
+    /** @return Paginator<TModel> */
     public function simplePaginate(int $limit = 10, array $criteria = []): Paginator
     {
         return $this->getNewBuilderWithScope()
@@ -57,19 +62,22 @@ abstract class AbstractRepository implements RepositoryInterface
             ->simplePaginate($limit);
     }
 
-    public function findOrFail(int $id, array $columns = ['*']): EloquentModel
+    /** @return TModel */
+    public function findOrFail(int $id, array $columns = ['*']): Model
     {
         return $this->getNewBuilderWithScope()
             ->with($this->with)
             ->findOrFail($id, $columns);
     }
 
-    public function create(array $data = []): EloquentModel
+    /** @return TModel */
+    public function create(array $data = []): Model
     {
         return $this->getNewBuilderWithScope()->create($data);
     }
 
-    public function update(int $id, array $data = []): int|bool|EloquentModel
+    /** @return TModel|int|bool */
+    public function update(int $id, array $data = []): int|bool|Model
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->update($data);
     }
@@ -80,7 +88,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @return Builder[]|Collection
+     * @return Builder<TModel>[]|Collection<int, TModel>
      */
     public function get(array $criteria = [], array $columns = ['*']): Collection|array
     {
@@ -92,13 +100,15 @@ abstract class AbstractRepository implements RepositoryInterface
             ->get($columns);
     }
 
-    public function find(int $id, array $columns = ['*']): ?EloquentModel
+    /** @return ?TModel */
+    public function find(int $id, array $columns = ['*']): ?Model
     {
         return $this->getNewBuilderWithScope()
             ->with($this->with)
             ->find($id, $columns);
     }
 
+    /** @return ?TModel */
     public function first(array $criteria = [], array $columns = ['*']): ?Model
     {
         return $this->getNewBuilderWithScope()
@@ -109,6 +119,7 @@ abstract class AbstractRepository implements RepositoryInterface
             ->first($columns);
     }
 
+    /** @return ?TModel */
     public function last(string $key = 'id', array $criteria = [], array $columns = ['*']): ?Model
     {
         return $this->getNewBuilderWithScope()
@@ -132,8 +143,12 @@ abstract class AbstractRepository implements RepositoryInterface
         return $this;
     }
 
+    /**
+     * @return Builder<TModel>
+     */
     private function getNewBuilderWithScope(): Builder
     {
+        /** @var Builder<TModel> $newQuery */
         $newQuery = $this->model->newQuery();
 
         foreach ($this->scopes as $scope) {
