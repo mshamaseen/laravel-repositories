@@ -5,6 +5,11 @@ namespace Shamaseen\Repository\Utility\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Psr\SimpleCache\InvalidArgumentException;
 
+/**
+ * @method Builder disableCache()
+ * @method Builder enableCache()
+ * @method Builder clearCache()
+ */
 trait CachePerRequest
 {
     public bool $requestCacheEnabled = true;
