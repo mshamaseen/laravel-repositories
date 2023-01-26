@@ -17,6 +17,7 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
  * @method static Builder newModelQuery()
  * @method static Builder newQuery()
  * @method static Builder query()
+ *
  * @mixin Eloquent
  */
 class Model extends Eloquent implements CriteriableModelInterface

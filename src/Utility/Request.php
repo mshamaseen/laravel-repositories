@@ -10,6 +10,7 @@ namespace Shamaseen\Repository\Utility;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 /**
  * Class BaseRequests.
@@ -50,7 +51,7 @@ class Request extends FormRequest
                 $lastPart = last(explode('@', $routeName));
                 $validatorName = $lastPart.'Rules';
 
-                $reflection = new \ReflectionClass($this);
+                $reflection = new ReflectionClass($this);
                 // make sure the method is exists in the user defined request
                 if ($reflection->hasMethod($validatorName) && $reflection->getMethod($validatorName)->class === $reflection->getName()) {
                     $rules += $this->{$validatorName}();

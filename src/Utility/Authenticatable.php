@@ -17,6 +17,7 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
  * @method static Builder newModelQuery()
  * @method static Builder newQuery()
  * @method static Builder query()
+ *
  * @mixin LaravelUser
  */
 class Authenticatable extends LaravelUser implements CriteriableModelInterface

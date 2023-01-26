@@ -2,6 +2,7 @@
 
 namespace Shamaseen\Repository\Middlewares;
 
+use App;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -28,15 +29,13 @@ class MultiLanguage
             Cookie::queue(Cookie::forever('language', $preferred));
         }
 
-        \App::setLocale($preferred);
+        App::setLocale($preferred);
 
         return $next($request);
     }
 
     /**
      * Detect the preferred language form the user browser setting.
-     *
-     * @param $http_accept_language
      *
      * @return int|string
      */

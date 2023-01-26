@@ -90,9 +90,6 @@ class Controller extends LaravelController
      * Any data that depend on the request instance should be inside this callback,
      * Request instance should be initialized after other middlewares.
      *
-     * @param $method
-     * @param $parameters
-     *
      * @return Response
      *
      * @throws AuthorizationException
