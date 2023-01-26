@@ -4,6 +4,7 @@ namespace Shamaseen\Repository\Utility;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as LaravelUser;
+use Shamaseen\Repository\Interfaces\CriteriableModelInterface;
 use Shamaseen\Repository\Utility\Models\CachePerRequest;
 use Shamaseen\Repository\Utility\Models\Criteriable;
 
@@ -12,16 +13,13 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
  *
  * @property array $searchables
  *
- * @method static Builder orderByCriteria()
- * @method static Builder searchByCriteria()
- * @method static Builder filterByCriteria()
  * @method static Builder whereId($value)
  * @method static Builder newModelQuery()
  * @method static Builder newQuery()
  * @method static Builder query()
  * @mixin LaravelUser
  */
-class Authenticatable extends LaravelUser
+class Authenticatable extends LaravelUser implements CriteriableModelInterface
 {
     use Criteriable;
     use CachePerRequest;
