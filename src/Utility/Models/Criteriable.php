@@ -20,6 +20,13 @@ trait Criteriable
      */
     protected ?array $fulltextSearch = [];
 
+    public function scopeAppendSortables($query, array $sortables): Builder
+    {
+        $this->sortables = $this->sortables + $sortables;
+
+        return $query;
+    }
+    
     public function scopeFilterByCriteria($query, array $criteria): Builder
     {
         foreach ($this->getFilterables() as $method => $columns) {
