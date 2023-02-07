@@ -26,7 +26,7 @@ trait Criteriable
 
         return $query;
     }
-    
+
     public function scopeFilterByCriteria($query, array $criteria): Builder
     {
         foreach ($this->getFilterables() as $method => $columns) {
