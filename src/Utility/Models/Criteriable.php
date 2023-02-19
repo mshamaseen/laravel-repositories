@@ -22,7 +22,7 @@ trait Criteriable
 
     public function scopeAppendSortables($query, array $sortables): Builder
     {
-        $this->sortables = (array) $this->sortables + $sortables;
+        $this->sortables = collect($this->sortables)->merge($sortables)->unique()->toArray();
 
         return $query;
     }
