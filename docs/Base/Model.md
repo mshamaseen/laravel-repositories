@@ -35,7 +35,7 @@ Model::searchByCriteria($criteria);
 Model::orderByCriteria($criteria);
 ```
 
-Only `fillables` are filterable/searchable by default, to override this behavior, define `$searchables` or `$filterable` properties in your model and fill it with the desired columns.
+Only `fillables` are filterable/searchable by default, to override this behavior, define `$searchables` or `$filterables` or `$sortables` properties in your model and fill it with the desired columns.
 
 ### Fulltext search
 
@@ -54,7 +54,7 @@ Each array inside `$fulltextSearch` represent the fulltext indexes that will be 
 ### Relation filter/search
 To filter\search base on a relation you can define the relation name as the key and their columns as the value:
 ```
-    protected ?array $filterable = [
+    protected ?array $filterables = [
         'roles' => [
             'id',
             'name',
@@ -64,11 +64,17 @@ To filter\search base on a relation you can define the relation name as the key 
 ```
 
 ### Runtime manipulation
-You can define what filterable/searchable at run time by calling these functions:
+You can define what filterable/searchable/sortable at run time by calling these functions:
 
 ```
 Model::setSearchables(['name'])
 Model::setFilterables(['name']);
+Model::setSortables(['name']);
 ```
 
-Note that these methods are not query methods, meaning that you should call them on the model instance and not on the builder instance.
+Or append to the array that already defined in the model:
+```
+Model::appendSearchables(['name'])
+Model::appendFilterables(['name']);
+Model::appendSortables(['name']);
+```
