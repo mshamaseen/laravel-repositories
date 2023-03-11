@@ -20,6 +20,7 @@ trait Criteriable
     protected ?array $searchables = null;
     protected ?array $filterables = null;
     protected ?array $sortables = null;
+		protected string $fullTextSearchMode = '';
 
     /**
      * @var array<array<string>>
@@ -50,14 +51,23 @@ trait Criteriable
         return $query;
     }
 
-    public function scopeSearchByCriteria($query, array $criteria): Builder
-    {
-        if (isset($criteria['search'])) {
-            $query->where(function ($q) use ($criteria) {
-                foreach ((array) $this->fulltextSearch as $pair) {
-                    $q->orWhereRaw(sprintf("match(%s) against('%s')",
-                        implode(',', $pair), $criteria['search']));
-                }
+		private function buildMatchAgainst($query, array $columns, $search) {
+			return $query->whereRaw("MATCH(".implode(',', $columns).") AGAINST (? ".$this->fullTextSearchMode.")", $search);
+		}
+
+		public function scopeSearchByCriteria($query, array $criteria): Builder
+		{
+				if (isset($criteria['search'])) {
+						$query->where(function ($q) use ($criteria) {
+								foreach ($this->fulltextSearch as $method => $columns) {
+										if (method_exists($this, $method)) {
+												$q->orWhereHas($method, function($query) use ($criteria, $columns) {
+													$this->buildMatchAgainst($query, $columns, $criteria['search']);
+												});
+										} else {
+												$this->buildMatchAgainst($q, $columns, $criteria['search']);
+										}
+								}
 
                 /*
                  * @var Builder $q
