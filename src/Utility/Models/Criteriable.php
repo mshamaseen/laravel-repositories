@@ -20,7 +20,7 @@ trait Criteriable
     protected ?array $searchables = null;
     protected ?array $filterables = null;
     protected ?array $sortables = null;
-		protected string $fullTextSearchMode = '';
+    protected string $fullTextSearchMode = '';
 
     /**
      * @var array<array<string>>
