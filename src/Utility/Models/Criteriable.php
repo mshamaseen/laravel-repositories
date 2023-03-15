@@ -51,23 +51,24 @@ trait Criteriable
         return $query;
     }
 
-		private function buildMatchAgainst($query, array $columns, $search) {
-			return $query->whereRaw("MATCH(".implode(',', $columns).") AGAINST (? ".$this->fullTextSearchMode.")", $search);
-		}
+    private function buildMatchAgainst($query, array $columns, $search)
+    {
+        return $query->whereRaw("MATCH(" . implode(',', $columns) . ") AGAINST (? " . $this->fullTextSearchMode . ")", $search);
+    }
 
-		public function scopeSearchByCriteria($query, array $criteria): Builder
-		{
-				if (isset($criteria['search'])) {
-						$query->where(function ($q) use ($criteria) {
-								foreach ($this->fulltextSearch as $method => $columns) {
-										if (method_exists($this, $method)) {
-												$q->orWhereHas($method, function($query) use ($criteria, $columns) {
-													$this->buildMatchAgainst($query, $columns, $criteria['search']);
-												});
-										} else {
-												$this->buildMatchAgainst($q, $columns, $criteria['search']);
-										}
-								}
+    public function scopeSearchByCriteria($query, array $criteria): Builder
+    {
+        if (isset($criteria['search'])) {
+            $query->where(function ($q) use ($criteria) {
+                foreach ($this->fulltextSearch as $method => $columns) {
+                    if (method_exists($this, $method)) {
+                        $q->orWhereHas($method, function ($query) use ($criteria, $columns) {
+                            $this->buildMatchAgainst($query, $columns, $criteria['search']);
+                        });
+                    } else {
+                        $this->buildMatchAgainst($q, $columns, $criteria['search']);
+                    }
+                }
 
                 /*
                  * @var Builder $q
