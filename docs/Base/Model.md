@@ -51,6 +51,41 @@ If you want to use fulltext search instead of `like` search, you should define y
 
 Each array inside `$fulltextSearch` represent the fulltext indexes that will be used inside the `match` query.
 
+You may search in a relationship that has a fulltext search index.
+
+```
+    protected ?array $fulltextSearch = [
+        'posts' => [
+            'content'
+        ]
+    ];
+```
+
+Although when searching in a relationship you may only search at one index or composite index, this means the following wouldn't work
+
+```
+    protected ?array $fulltextSearch = [
+        'posts' => [
+            ['content'],
+            ['exerpt'],
+        ]
+    ];
+```
+
+Both syntaxes may be combined to search locally and in relationships.
+
+```
+    protected ?array $fulltextSearch = [
+        [
+            'firstname', 'lastname',
+        ],
+        // can't search in different indexes.
+        'parents' => [
+            'firstname', 'lastname',
+        ]
+    ];
+```
+
 ### Relation filter/search
 To filter\search base on a relation you can define the relation name as the key and their columns as the value:
 ```
