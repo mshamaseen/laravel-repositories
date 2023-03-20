@@ -86,6 +86,8 @@ Both syntaxes may be combined to search locally and in relationships.
     ];
 ```
 
+In simple and most common scenarios [MYSQL](https://dev.mysql.com/doc/refman/8.0/en/fulltext-natural-language.html) will provide an order based on the relevance of the results of full text search results, for more complex queries use the `relevance` parameter in `searchByCriteria` scope.
+
 ### Relation filter/search
 To filter\search base on a relation you can define the relation name as the key and their columns as the value:
 ```
