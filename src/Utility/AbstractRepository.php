@@ -148,7 +148,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @return Builder<TModel>
      */
-    private function getNewBuilderWithScope(): Builder
+    public function getNewBuilderWithScope(): Builder
     {
         /** @var Builder<TModel> $newQuery */
         $newQuery = $this->model->newQuery();
