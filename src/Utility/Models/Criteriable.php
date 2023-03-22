@@ -23,11 +23,6 @@ trait Criteriable
     protected string $fullTextSearchMode = '';
 
     /**
-     * @var callable(Builder):int $relevanceMethod
-     */
-    protected $relevanceMethod;
-
-    /**
      * @var array<array<string>>
      */
     protected ?array $fulltextSearch = [];
@@ -61,17 +56,10 @@ trait Criteriable
         return $query->whereRaw('MATCH('.implode(',', $columns).') AGAINST (? '.$this->fullTextSearchMode.')', $search);
     }
 
-    /**
-     * @param callable(Builder, array):Builder|null $relevance
-     */
-    public function scopeSearchByCriteria($query, array $criteria, callable $relevance = null): Builder
+    public function scopeSearchByCriteria($query, array $criteria): Builder
     {
         if (!isset($criteria['search'])) {
             return $query;
-        }
-
-        if($relevance && is_callable($relevance)) {
-            $relevance($query, $criteria);
         }
 
         $query->where(function ($q) use ($criteria) {
