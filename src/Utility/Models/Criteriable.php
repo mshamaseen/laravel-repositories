@@ -53,43 +53,45 @@ trait Criteriable
 
     private function buildMatchAgainst($query, array $columns, $search)
     {
-        return $query->whereRaw("MATCH(" . implode(',', $columns) . ") AGAINST (? " . $this->fullTextSearchMode . ")", $search);
+        return $query->whereRaw('MATCH('.implode(',', $columns).') AGAINST (? '.$this->fullTextSearchMode.')', $search);
     }
 
     public function scopeSearchByCriteria($query, array $criteria): Builder
     {
-        if (isset($criteria['search'])) {
-            $query->where(function ($q) use ($criteria) {
-                foreach ($this->fulltextSearch as $method => $columns) {
-                    if (method_exists($this, $method)) {
-                        $q->orWhereHas($method, function ($query) use ($criteria, $columns) {
-                            $this->buildMatchAgainst($query, $columns, $criteria['search']);
-                        });
-                    } else {
-                        $this->buildMatchAgainst($q, $columns, $criteria['search']);
-                    }
-                }
-
-                /*
-                 * @var Builder $q
-                 */
-                foreach ($this->getSearchables() as $method => $columns) {
-                    if (method_exists($this, $method)) {
-                        $q->orWhereHas($method, function ($query) use ($criteria, $columns) {
-                            /* @var $query Builder */
-                            $query->where(function ($query2) use ($criteria, $columns) {
-                                /* @var $query2 Builder */
-                                foreach ((array) $columns as $column) {
-                                    $query2->orWhere($column, 'like', $criteria['search'].'%');
-                                }
-                            });
-                        });
-                    } else {
-                        $q->orWhere($columns, 'like', $criteria['search'].'%');
-                    }
-                }
-            });
+        if (!isset($criteria['search'])) {
+            return $query;
         }
+
+        $query->where(function ($q) use ($criteria) {
+            foreach ($this->fulltextSearch as $method => $columns) {
+                if (method_exists($this, $method)) {
+                    $q->orWhereHas($method, function ($q2) use ($criteria, $columns) {
+                        $this->buildMatchAgainst($q2, $columns, $criteria['search']);
+                    });
+                } else {
+                    $this->buildMatchAgainst($q, $columns, $criteria['search']);
+                }
+            }
+
+            /*
+             * @var Builder $q
+             */
+            foreach ($this->getSearchables() as $method => $columns) {
+                if (method_exists($this, $method)) {
+                    $q->orWhereHas($method, function ($query) use ($criteria, $columns) {
+                        /* @var $query Builder */
+                        $query->where(function ($query2) use ($criteria, $columns) {
+                            /* @var $query2 Builder */
+                            foreach ((array) $columns as $column) {
+                                $query2->orWhere($column, 'like', $criteria['search'].'%');
+                            }
+                        });
+                    });
+                } else {
+                    $q->orWhere($columns, 'like', $criteria['search'].'%');
+                }
+            }
+        });
 
         return $query;
     }
