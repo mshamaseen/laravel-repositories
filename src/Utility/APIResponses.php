@@ -25,14 +25,14 @@ class APIResponses implements CrudResponse
     {
         $resource = new $this->controller->collectionClass($paginate);
 
+        $resource->additional = $this->controller->params;
+
         $response = $resource->response();
         $code = Response::HTTP_OK;
 
         if ($paginate->hasMorePages()) {
             $code = Response::HTTP_PARTIAL_CONTENT;
         }
-
-        $resource->additional = $this->controller->params;
 
         return $response->setStatusCode($code);
     }
