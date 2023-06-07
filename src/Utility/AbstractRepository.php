@@ -65,7 +65,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /** @return TModel */
-    public function findOrFail(int $id, array $columns = ['*']): EloquentModel
+    public function findOrFail(int|string $id, array $columns = ['*']): EloquentModel
     {
         return $this->getNewBuilderWithScope()
             ->with($this->with)
@@ -79,12 +79,12 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /** @return TModel|int|bool */
-    public function update(int $id, array $data = []): int|bool|EloquentModel
+    public function update(int|string $id, array $data = []): int|bool|EloquentModel
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->update($data);
     }
 
-    public function delete(int $id = 0): int|bool
+    public function delete(int|string $id = 0): int|bool
     {
         return $this->getNewBuilderWithScope()->where('id', $id)->delete();
     }
@@ -103,7 +103,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /** @return ?TModel */
-    public function find(int $id, array $columns = ['*']): ?EloquentModel
+    public function find(int|string $id, array $columns = ['*']): ?EloquentModel
     {
         return $this->getNewBuilderWithScope()
             ->with($this->with)

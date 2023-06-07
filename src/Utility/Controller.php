@@ -143,7 +143,7 @@ class Controller extends LaravelController
     /**
      * Display the specified resource.
      */
-    public function show(int $entityId): View|JsonResponse
+    public function show(int|string $entityId): View|JsonResponse
     {
         $this->breadcrumbs->put('view', [
             'link' => '',
@@ -181,7 +181,7 @@ class Controller extends LaravelController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $entityId): View|JsonResponse
+    public function edit(int|string $entityId): View|JsonResponse
     {
         $this->breadcrumbs->put('edit', [
             'link' => '',
@@ -196,7 +196,7 @@ class Controller extends LaravelController
     /**
      * Update the specified resource in storage.
      */
-    public function update(int $entityId): JsonResponse|RedirectResponse
+    public function update(int|string $entityId): JsonResponse|RedirectResponse
     {
         $updatedCount = $this->repository->update($entityId, $this->request->except(['_token', '_method']));
 
@@ -208,7 +208,7 @@ class Controller extends LaravelController
      *
      * @throws Exception
      */
-    public function destroy(int $entityId): JsonResponse|RedirectResponse
+    public function destroy(int|string $entityId): JsonResponse|RedirectResponse
     {
         $deletedCount = $this->repository->delete($entityId);
 
