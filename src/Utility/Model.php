@@ -11,7 +11,7 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
 /**
  * App\Entities\BaseEntity.
  *
- * @property array $searchable
+ * @property array $searchables
  *
  * @method static Builder whereId($value)
  * @method static Builder newModelQuery()
