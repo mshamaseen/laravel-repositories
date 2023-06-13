@@ -38,7 +38,9 @@ trait Criteriable
                         $query->where(function ($query2) use ($criteria, $columns, $method) {
                             /* @var $query2 Builder */
                             foreach ((array) $columns as $column) {
-                                $query2->where($column, $criteria[$method]);
+                                if(isset($criteria[$method][$column])) {
+                                    $query2->where($column, $criteria[$method][$column]);
+                                }
                             }
                         });
                     });
