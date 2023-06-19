@@ -87,6 +87,20 @@ class APIResponses implements CrudResponse
 
     public function update(int|bool|EloquentModel $updatedCount): JsonResponse
     {
+        if ($updatedCount instanceof EloquentModel) {
+            /**
+             * @var JsonResource $resource
+             */
+            $resource = new $this->controller->resourceClass($updatedCount);
+
+            return $resource
+                ->additional(array_merge([
+                    'message' => __('repository.modified_successfully'),
+                ], $this->controller->params))
+                ->response()
+                ->setStatusCode(Response::HTTP_OK);
+        }
+
         return response()->json(
             [
                 'message' => __('repository.modified_successfully'),

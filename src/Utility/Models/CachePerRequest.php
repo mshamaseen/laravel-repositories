@@ -50,8 +50,23 @@ trait CachePerRequest
         return 'repository-cache';
     }
 
-    public function getConnection()
+    public function getConnection(): ConnectionProxy
     {
         return new ConnectionProxy(static::resolveConnection($this->getConnectionName()), $this);
+    }
+
+    public function refresh(): self
+    {
+        $wasEnabled = $this->requestCacheEnabled;
+
+        $this->disableCache();
+
+        $result = parent::refresh();
+
+        if ($wasEnabled) {
+            $this->enableCache();
+        }
+
+        return $result;
     }
 }
