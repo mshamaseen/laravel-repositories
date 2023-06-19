@@ -18,14 +18,14 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
  * @method static Builder newQuery()
  * @method static Builder query()
  *
- * @mixin LaravelUser
+ * @extends LaravelUser
  */
 class Authenticatable extends LaravelUser implements CriteriableModelInterface
 {
     use Criteriable;
     use CachePerRequest;
 
-    protected $dates = [
+    protected array $dates = [
         'created_at',
         'updated_at',
     ];
