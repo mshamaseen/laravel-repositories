@@ -14,6 +14,13 @@ use Shamaseen\Repository\PathResolver;
  */
 class Generator extends Command
 {
+    const REPOSITORY_OPTION = 'repository';
+    const CONTROLLER_OPTION = 'controller';
+    const MODEL_OPTION = 'model';
+    const RESOURCE_OPTION = 'transformer';
+    const POLICY_OPTION = 'policy';
+    const REQUEST_OPTION = 'input';
+
     /**
      * The name and signature of the console command.
      *
@@ -23,7 +30,13 @@ class Generator extends Command
     {name : Class (singular) for example User}
     {--base= : Base path to inject the files\folders in}
     {--f|force : force overwrite files}
-    {--no-override : don\'t override any file}';
+    {--no-override : don\'t override any file}
+    {--m|model : model only}
+    {--c|controller : controller only}
+    {--r|repository : repository only}
+    {--t|transformer : transformers (API resources) only}
+    {--p|policy : policy only}
+    {--i|input : input validation (request file) only}';
 
     protected $description = 'Create repository files';
 
@@ -49,6 +62,19 @@ class Generator extends Command
      */
     public function handle(): int
     {
+        // if no file is specified, then generate them all
+        if (!$this->option(self::REQUEST_OPTION) && !$this->option(self::CONTROLLER_OPTION)
+            && !$this->option(self::REPOSITORY_OPTION) && !$this->option(self::RESOURCE_OPTION)
+            && !$this->option(self::MODEL_OPTION) && !$this->option(self::POLICY_OPTION)
+        ) {
+            $this->input->setOption(self::MODEL_OPTION, true);
+            $this->input->setOption(self::CONTROLLER_OPTION, true);
+            $this->input->setOption(self::RESOURCE_OPTION, true);
+            $this->input->setOption(self::REQUEST_OPTION, true);
+            $this->input->setOption(self::REPOSITORY_OPTION, true);
+            $this->input->setOption(self::POLICY_OPTION, true);
+        }
+
         $paths = preg_split(' ([/\\\]) ', $this->argument('name'));
 
         if (!$paths) {
@@ -78,13 +104,30 @@ class Generator extends Command
         $resourceParent = Config::get('repository.resource_parent');
         $collectionParent = Config::get('repository.collection_parent');
 
-        $this->generate('Controller', $controllerParent);
-        $this->generate('Model', $modelParent);
-        $this->generate('Request', $requestParent);
-        $this->generate('Repository', $repositoryParent);
-        $this->generate('Resource', $resourceParent);
-        $this->generate('Collection', $collectionParent);
-        $this->generate('Policy');
+        if ($this->option(self::CONTROLLER_OPTION)) {
+            $this->generate('Controller', $controllerParent);
+        }
+
+        if ($this->option(self::MODEL_OPTION)) {
+            $this->generate('Model', $modelParent);
+        }
+
+        if ($this->option(self::REQUEST_OPTION)) {
+            $this->generate('Request', $requestParent);
+            $this->generate('Collection', $collectionParent);
+        }
+
+        if ($this->option(self::REPOSITORY_OPTION)) {
+            $this->generate('Repository', $repositoryParent);
+        }
+
+        if ($this->option(self::RESOURCE_OPTION)) {
+            $this->generate('Resource', $resourceParent);
+        }
+
+        if ($this->option(self::POLICY_OPTION)) {
+            $this->generate('Policy');
+        }
 
         RepositoryFilesGenerated::dispatch($this->basePath, $this->userPath, $this->modelName);
 
@@ -123,12 +166,49 @@ class Generator extends Command
             ->replace('{{ResourcesNamespace}}', $this->pathResolver->typeNamespace('Resource'))
             ->replace('{{ModelNamespace}}', $this->pathResolver->typeNamespace('Model'))
             ->replace('{{PoliciesNamespace}}', $this->pathResolver->typeNamespace('Policy'))
+            ->replace('{{ResourcesProperties}}', $this->resourceProperty())
+            ->replace('{{RequestProperty}}', $this->requestProperty())
+            ->replace('{{PolicyProperty}}', $this->policyProperty())
             ->output($outputPath);
 
         return true;
     }
 
-    private function dumpAutoload()
+    public function resourceProperty(): string
+    {
+        $result = '';
+
+        if ($this->option(self::RESOURCE_OPTION)) {
+            $result .= "\n\t".'public ?string $resourceClass = '. $this->modelName .'Resource::class;'."\n";
+            $result .= "\n\t".'public ?string $collectionClass = '. $this->modelName .'Collection::class;'."\n";
+        }
+
+        return $result;
+    }
+
+    public function requestProperty(): string
+    {
+        $result = '';
+
+        if ($this->option(self::RESOURCE_OPTION)) {
+            $result .= "\n\t".'public string $requestClass = '. $this->modelName .'Request::class;'."\n";
+        }
+
+        return $result;
+    }
+
+    public function policyProperty(): string
+    {
+        $result = '';
+
+        if ($this->option(self::RESOURCE_OPTION)) {
+            $result .= "\n\t".'public ?string $policyClass = '. $this->modelName .'Policy::class;'."\n";
+        }
+
+        return $result;
+    }
+
+    private function dumpAutoload(): void
     {
         shell_exec('composer dump-autoload');
     }
