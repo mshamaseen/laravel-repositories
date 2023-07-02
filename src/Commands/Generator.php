@@ -63,7 +63,7 @@ class Generator extends Command
     public function handle(): int
     {
         // if no file is specified, then generate them all
-        if(!$this->option(self::REQUEST_OPTION) && !$this->option(self::CONTROLLER_OPTION)
+        if (!$this->option(self::REQUEST_OPTION) && !$this->option(self::CONTROLLER_OPTION)
             && !$this->option(self::REPOSITORY_OPTION) && !$this->option(self::RESOURCE_OPTION)
             && !$this->option(self::MODEL_OPTION) && !$this->option(self::POLICY_OPTION)
         ) {
@@ -104,28 +104,28 @@ class Generator extends Command
         $resourceParent = Config::get('repository.resource_parent');
         $collectionParent = Config::get('repository.collection_parent');
 
-        if($this->option(self::CONTROLLER_OPTION)) {
+        if ($this->option(self::CONTROLLER_OPTION)) {
             $this->generate('Controller', $controllerParent);
         }
 
-        if($this->option(self::MODEL_OPTION)) {
+        if ($this->option(self::MODEL_OPTION)) {
             $this->generate('Model', $modelParent);
         }
 
-        if($this->option(self::REQUEST_OPTION)) {
+        if ($this->option(self::REQUEST_OPTION)) {
             $this->generate('Request', $requestParent);
             $this->generate('Collection', $collectionParent);
         }
 
-        if($this->option(self::REPOSITORY_OPTION)) {
+        if ($this->option(self::REPOSITORY_OPTION)) {
             $this->generate('Repository', $repositoryParent);
         }
 
-        if($this->option(self::RESOURCE_OPTION)) {
+        if ($this->option(self::RESOURCE_OPTION)) {
             $this->generate('Resource', $resourceParent);
         }
 
-        if($this->option(self::POLICY_OPTION)) {
+        if ($this->option(self::POLICY_OPTION)) {
             $this->generate('Policy');
         }
 
@@ -174,11 +174,11 @@ class Generator extends Command
         return true;
     }
 
-    function resourceProperty(): string
+    public function resourceProperty(): string
     {
         $result = '';
 
-        if($this->option(self::RESOURCE_OPTION)) {
+        if ($this->option(self::RESOURCE_OPTION)) {
             $result .= "\n\t".'public ?string $resourceClass = '. $this->modelName .'Resource::class;'."\n";
             $result .= "\n\t".'public ?string $collectionClass = '. $this->modelName .'Collection::class;'."\n";
         }
@@ -186,22 +186,22 @@ class Generator extends Command
         return $result;
     }
 
-    function requestProperty(): string
+    public function requestProperty(): string
     {
         $result = '';
 
-        if($this->option(self::RESOURCE_OPTION)) {
+        if ($this->option(self::RESOURCE_OPTION)) {
             $result .= "\n\t".'public string $requestClass = '. $this->modelName .'Request::class;'."\n";
         }
 
         return $result;
     }
 
-    function policyProperty(): string
+    public function policyProperty(): string
     {
         $result = '';
 
-        if($this->option(self::RESOURCE_OPTION)) {
+        if ($this->option(self::RESOURCE_OPTION)) {
             $result .= "\n\t".'public ?string $policyClass = '. $this->modelName .'Policy::class;'."\n";
         }
 

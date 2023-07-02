@@ -2,6 +2,7 @@
 
 namespace Shamaseen\Repository\Tests\Feature;
 
+use App\Http\Controllers\Tests\TestController;
 use App\Models\Tests\Test;
 use Illuminate\Support\Facades\Route;
 use Shamaseen\Repository\Tests\TestCase;
@@ -27,9 +28,10 @@ class CrudTest extends TestCase
 
     public function testIndex()
     {
-        Route::get('tests', [\App\Http\Controllers\Tests\TestController::class, 'index']);
+        Route::get('tests', [TestController::class, 'index']);
 
         $response = $this->getJson('tests');
+
         $this->assertContains($response->getStatusCode(), [
             Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
         ]);
@@ -37,7 +39,7 @@ class CrudTest extends TestCase
 
     public function testShow()
     {
-        Route::get('tests/{id}', [\App\Http\Controllers\Tests\TestController::class, 'show']);
+        Route::get('tests/{id}', [TestController::class, 'show']);
 
         $response = $this->getJson('tests/1');
 
@@ -48,7 +50,7 @@ class CrudTest extends TestCase
 
     public function testCreate()
     {
-        Route::get('tests/create', [\App\Http\Controllers\Tests\TestController::class, 'create']);
+        Route::get('tests/create', [TestController::class, 'create']);
 
         $response = $this->getJson('tests/create');
         $this->assertContains($response->getStatusCode(), [
@@ -58,7 +60,7 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
-        Route::post('tests', [\App\Http\Controllers\Tests\TestController::class, 'store']);
+        Route::post('tests', [TestController::class, 'store']);
 
         $data = [
             'name' => 'Create Test',
@@ -84,7 +86,7 @@ class CrudTest extends TestCase
      */
     public function testUpdate(int $id)
     {
-        Route::put('tests/{id}', [\App\Http\Controllers\Tests\TestController::class, 'update']);
+        Route::put('tests/{id}', [TestController::class, 'update']);
 
         $data = [
             'name' => 'Update Test',
@@ -107,7 +109,7 @@ class CrudTest extends TestCase
      */
     public function testDelete(int $id)
     {
-        Route::delete('tests/{id}', [\App\Http\Controllers\Tests\TestController::class, 'destroy']);
+        Route::delete('tests/{id}', [TestController::class, 'destroy']);
 
         $response = $this->deleteJson('tests/'.$id);
         $this->assertContains($response->getStatusCode(), [
