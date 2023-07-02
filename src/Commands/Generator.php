@@ -23,7 +23,14 @@ class Generator extends Command
     {name : Class (singular) for example User}
     {--base= : Base path to inject the files\folders in}
     {--f|force : force overwrite files}
-    {--no-override : don\'t override any file}';
+    {--no-override : don\'t override any file}
+    {-m : model only}
+    {-c : controller only}
+    {-r : repository only}
+    {-t : transformers (API resources) only}
+    {-tc : transformers (API resources) only}
+    {-p : transformers (API resources) only}
+    {-i : input validation (request file) only}';
 
     protected $description = 'Create repository files';
 
@@ -49,6 +56,15 @@ class Generator extends Command
      */
     public function handle(): int
     {
+        // if no file is specified, then generate them all
+        if(!$this->hasOption('m') && !$this->hasOption('c') && !$this->hasOption('r') && !$this->hasOption('t') && !$this->hasOption('i')) {
+            $this->input->setOption('m', true);
+            $this->input->setOption('c', true);
+            $this->input->setOption('r', true);
+            $this->input->setOption('i', true);
+            $this->input->setOption('t', true);
+        }
+
         $paths = preg_split(' ([/\\\]) ', $this->argument('name'));
 
         if (!$paths) {
@@ -78,7 +94,10 @@ class Generator extends Command
         $resourceParent = Config::get('repository.resource_parent');
         $collectionParent = Config::get('repository.collection_parent');
 
-        $this->generate('Controller', $controllerParent);
+        if($this->hasOption('c')) {
+            $this->generate('Controller', $controllerParent);
+        }
+
         $this->generate('Model', $modelParent);
         $this->generate('Request', $requestParent);
         $this->generate('Repository', $repositoryParent);

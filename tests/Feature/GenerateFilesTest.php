@@ -41,4 +41,16 @@ class GenerateFilesTest extends TestCase
             $this->assertFileExists($absolutePath);
         }
     }
+
+    public function testGenerateMCROnly()
+    {
+        $this->artisan("generate:repository $this->userPath/$this->modelName -f -mvr");
+
+        $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection', 'Policy'];
+        foreach ($this->filesToGenerate as $type) {
+            $absolutePath = $this->pathResolver->absolutePath($type);
+
+            $this->assertFileExists($absolutePath);
+        }
+    }
 }
