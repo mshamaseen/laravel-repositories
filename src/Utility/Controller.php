@@ -62,8 +62,8 @@ class Controller extends LaravelController
     public ResponseDispatcher $responseDispatcher;
     public string $requestClass = Request::class;
     public ?string $policyClass = null;
-    public ?string $resourceClass;
-    public ?string $collectionClass;
+    public ?string $resourceClass = Resource::class;
+    public ?string $collectionClass = ResourceCollection::class;
 
     /**
      * BaseController constructor.
