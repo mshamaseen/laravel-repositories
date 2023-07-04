@@ -1,0 +1,122 @@
+<?php
+
+namespace {{namespace}};
+
+use App\Http\Controllers\{{modelName}}s\{{modelName}}Controller;
+use App\Models\{{modelName}}s\{{modelName}};
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+use Shamaseen\Repository\Tests\TestCase;
+use Symfony\Component\HttpFoundation\Response;
+
+class {{modelName}}Test extends TestCase
+{
+    protected string $modelName = '{{modelName}}';
+    protected string  $routePath = "{{modelName}}s";
+
+    /**
+     * @param string $dataName
+     */
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+       $this->routePath = Str::lower($this->routePath);
+        parent::__construct($name, $data, $dataName);
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
+
+    public function testIndex()
+    {
+        Route::get($this->routePath, [{{modelName}}Controller::class, 'index']);
+
+        $response = $this->getJson($this->routePath);
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+    }
+
+    public function testShow()
+    {
+        Route::get("$this->routePath/{id}", [{{modelName}}Controller::class, 'show']);
+
+        $response = $this->getJson("$this->routePath/1");
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK,
+        ]);
+    }
+
+    public function testCreate()
+    {
+        Route::get("$this->routePath/create", [{{modelName}}Controller::class, 'create']);
+
+        $response = $this->getJson("$this->routePath/create");
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_NO_CONTENT,
+        ]);
+    }
+
+    public function testStore()
+    {
+        Route::post($this->routePath, [{{modelName}}Controller::class, 'store']);
+
+        $data = [
+            'name' => 'Create Test',
+            'type' => 'New',
+        ];
+
+        $response = $this->postJson($this->routePath, $data);
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_CREATED,
+        ]);
+
+        $content = json_decode($response->getContent())->data;
+
+        $test = {{modelName}}::findOrFail($content->id);
+        $this->assertEquals($data['name'], $test->name);
+        $this->assertEquals($data['type'], $test->type);
+
+        return $content->id;
+    }
+
+    /**
+     * @depends testStore
+     */
+    public function testUpdate(int $id)
+    {
+        Route::put("$this->routePath/{id}", [{{modelName}}Controller::class, 'update']);
+
+        $data = [
+            'name' => 'Update {{modelName}}',
+            'type' => 'Updated',
+        ];
+
+        $response = $this->putJson("$this->routePath"."/".$id, $data);
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK,
+        ]);
+
+        $test = {{modelName}}::findOrFail($id);
+        $this->assertEquals($data['name'], $test->name);
+        $this->assertEquals($data['type'], $test->type);
+    }
+
+    /**
+     * @depends testStore
+     */
+    public function testDelete(int $id)
+    {
+        Route::delete("$this->routePath/{id}", [{{modelName}}Controller::class, 'destroy']);
+
+        $response = $this->deleteJson($this->routePath.$id);
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK,
+        ]);
+    }
+}

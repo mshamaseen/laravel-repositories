@@ -129,6 +129,8 @@ class Generator extends Command
             $this->generate('Policy');
         }
 
+        $this->generate('Test');
+
         RepositoryFilesGenerated::dispatch($this->basePath, $this->userPath, $this->modelName);
 
         $this->dumpAutoload();
