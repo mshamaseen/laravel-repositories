@@ -14,43 +14,30 @@ class {{modelName}}Test extends TestCase
 
     use RefreshDatabase;
 
-    protected string $modelName = '{{modelName}}';
-    protected string  $routePath = "{{lcPluralModelName}}";
-
        public function testIndex()
        {
-           Route::get($this->routePath, [{{modelName}}Controller::class, 'index']);
-           $this->assertTrue(true);
+       // TODO implement index method
        }
 
        public function testShow()
        {
-           Route::get("$this->routePath/{id}", [{{modelName}}Controller::class, 'show']);
-           $this->assertTrue(true);
-
+          // TODO implement show method
        }
 
        public function testStore()
        {
-           Route::post($this->routePath, [{{modelName}}Controller::class, 'store']);
-
-           $this->assertTrue(true);
-           return $returnValue = 1;
+        // TODO implement store method
        }
 
-       /** depends testStore */
+
        public function testUpdate()
        {
-           Route::put("$this->routePath/{id}", [{{modelName}}Controller::class, 'update']);
-
-           $this->assertTrue(true);
+        // TODO implement update method
        }
 
-       /** depends testStore */
+
        public function testDelete()
        {
-           Route::delete("$this->routePath/{id}", [{{modelName}}Controller::class, 'destroy']);
-
-           $this->assertTrue(true);
+        // TODO implement delete method
        }
 }
