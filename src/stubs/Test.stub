@@ -2,42 +2,38 @@
 
 namespace {{namespace}};
 
-use App\Http\Controllers\{{ucPluralModelName}}\{{modelName}}Controller;
-use App\Models\{{ucPluralModelName}}\{{modelName}};
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Shamaseen\Repository\Tests\TestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 class {{modelName}}Test extends TestCase
 {
 
     use RefreshDatabase;
 
-       public function testIndex()
-       {
-       // TODO implement index method
-       }
+    public function testIndex()
+    {
+        // TODO implement index method
+    }
 
-       public function testShow()
-       {
-          // TODO implement show method
-       }
+    public function testShow()
+    {
+        // TODO implement show method
+    }
 
-       public function testStore()
-       {
+    public function testStore()
+    {
         // TODO implement store method
-       }
+    }
 
 
-       public function testUpdate()
-       {
+    public function testUpdate()
+    {
         // TODO implement update method
-       }
+    }
 
 
-       public function testDelete()
-       {
+    public function testDelete()
+    {
         // TODO implement delete method
-       }
+    }
 }

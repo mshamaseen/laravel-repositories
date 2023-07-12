@@ -152,7 +152,7 @@ class Generator extends Command
         $outputPath = $this->pathResolver->outputPath($type);
 
         if (!$this->option('force') && $realpath = realpath($this->generator->absolutePath($outputPath))) {
-            if ($this->option('no-override') || !$this->confirm('File '.$realpath.' is exist, do you want to overwrite it?')) {
+            if ($this->option('no-override') || !$this->confirm('File '.$realpath.' exists, do you want to overwrite it?')) {
                 return false;
             }
         }
@@ -160,7 +160,6 @@ class Generator extends Command
         $namespace = $this->pathResolver->typeNamespace($type);
         $lcModelName = Str::lower($this->modelName);
         $lcPluralModelName = Str::plural($lcModelName);
-        $ucPluralModelName = Str::plural(Str::ucfirst($this->modelName));
         $snackLcPluralModelName = Str::snake($this->modelName);
 
         $this->generator->stub($this->pathResolver->getStubPath($type))
@@ -178,7 +177,6 @@ class Generator extends Command
             ->replace('{{ResourcesProperties}}', $this->resourceProperty())
             ->replace('{{RequestProperty}}', $this->requestProperty())
             ->replace('{{PolicyProperty}}', $this->policyProperty())
-            ->replace('{{ucPluralModelName}}', $ucPluralModelName)
             ->output($outputPath);
 
         return true;
