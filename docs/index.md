@@ -23,7 +23,8 @@ After a request is being sent to the Laravel application, it follows these steps
 ![Repository Pattern Workflow](images/Repository Pattern.png)
 
 ### Benefits of this design
-1. Centralization of the data access logic makes code easier to maintain
-2. Business and data access logic can be tested separately
-3. Reduces duplication of code
-4. A lower chance for making programming errors
+1. Enforce single responsibility principle
+2. Business logic, request authorization, and request validation can be tested separately
+3. Prevent code duplication 
+4. Cleaner and more intuitive code.
+5. Allowing reusing business logic code across requests.
