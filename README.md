@@ -33,8 +33,7 @@ After a request is being sent to the Laravel application, it follows these steps
 7. The controller passes that data to the [resource file](https://laravel.com/docs/eloquent-resources) to format the data as needed.
 8. The controller finally return the response back to the user.
 
-![Repository Pattern Workflow](docs/images/Repository Pattern.png)
-
+![repository_pattern.png](docs/images/repository_pattern.png)
 
 ## Quick Usage
 
