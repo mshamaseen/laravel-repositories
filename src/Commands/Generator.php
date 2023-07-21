@@ -20,6 +20,7 @@ class Generator extends Command
     const RESOURCE_OPTION = 'transformer';
     const POLICY_OPTION = 'policy';
     const REQUEST_OPTION = 'input';
+    const TEST_OPTION = 'test';
 
     /**
      * The name and signature of the console command.
@@ -36,6 +37,7 @@ class Generator extends Command
     {--r|repository : repository only}
     {--t|transformer : transformers (API resources) only}
     {--p|policy : policy only}
+    {--test : test only}
     {--i|input : input validation (request file) only}';
 
     protected $description = 'Create repository files';
@@ -66,6 +68,7 @@ class Generator extends Command
         if (!$this->option(self::REQUEST_OPTION) && !$this->option(self::CONTROLLER_OPTION)
             && !$this->option(self::REPOSITORY_OPTION) && !$this->option(self::RESOURCE_OPTION)
             && !$this->option(self::MODEL_OPTION) && !$this->option(self::POLICY_OPTION)
+            && !$this->option(self::TEST_OPTION)
         ) {
             $this->input->setOption(self::MODEL_OPTION, true);
             $this->input->setOption(self::CONTROLLER_OPTION, true);
@@ -73,6 +76,7 @@ class Generator extends Command
             $this->input->setOption(self::REQUEST_OPTION, true);
             $this->input->setOption(self::REPOSITORY_OPTION, true);
             $this->input->setOption(self::POLICY_OPTION, true);
+            $this->input->setOption(self::TEST_OPTION, true);
         }
 
         $paths = preg_split(' ([/\\\]) ', $this->argument('name'));
@@ -129,6 +133,10 @@ class Generator extends Command
             $this->generate('Policy');
         }
 
+        if ($this->option(self::POLICY_OPTION)) {
+            $this->generate('Test');
+        }
+
         RepositoryFilesGenerated::dispatch($this->basePath, $this->userPath, $this->modelName);
 
         $this->dumpAutoload();
@@ -144,7 +152,7 @@ class Generator extends Command
         $outputPath = $this->pathResolver->outputPath($type);
 
         if (!$this->option('force') && $realpath = realpath($this->generator->absolutePath($outputPath))) {
-            if ($this->option('no-override') || !$this->confirm('File '.$realpath.' is exist, do you want to overwrite it?')) {
+            if ($this->option('no-override') || !$this->confirm('File '.$realpath.' exists, do you want to overwrite it?')) {
                 return false;
             }
         }
