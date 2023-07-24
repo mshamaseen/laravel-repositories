@@ -41,4 +41,13 @@ return [
      * api, web, both
      */
     'responses' => 'both',
+
+    /*
+     * Frontend Filters key
+     * if you want to filter on all URL parameters, leave it null
+     * for example, to only get filters from filters param in this Request URL:
+     * ?filters[first]=value&filters[second]=value&param=not a filter
+     * use filters instead of null here.
+     */
+    'filter_key' => null,
 ];

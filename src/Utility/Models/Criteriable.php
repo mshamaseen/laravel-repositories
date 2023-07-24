@@ -27,26 +27,44 @@ trait Criteriable
      */
     protected ?array $fulltextSearch = [];
 
+    public function getFilterKey()
+    {
+        return config('repository.filter_key');
+    }
+
+    protected function getFiltersFromCriteria(array $criteria): array
+    {
+        $filterKey = $this->getFilterKey();
+
+        if ($filterKey) {
+            return (array) ($criteria[$filterKey] ?? []);
+        }
+
+        return $criteria;
+    }
+
     public function scopeFilterByCriteria($query, array $criteria): Builder
     {
+        $requestFilters = $this->getFiltersFromCriteria($criteria);
+
         foreach ($this->getFilterables() as $method => $columns) {
             // if this is associative then it is a relation
             if ('string' === gettype($method)) {
-                if (method_exists($this, $method) && array_key_exists($method, $criteria)) {
-                    $query->whereHas($method, function ($query) use ($criteria, $columns, $method) {
+                if (method_exists($this, $method) && array_key_exists($method, $requestFilters)) {
+                    $query->whereHas($method, function ($query) use ($requestFilters, $columns, $method) {
                         /* @var $query Builder */
-                        $query->where(function ($query2) use ($criteria, $columns, $method) {
+                        $query->where(function ($query2) use ($requestFilters, $columns, $method) {
                             /* @var $query2 Builder */
                             foreach ((array) $columns as $column) {
-                                if(isset($criteria[$method][$column])) {
-                                    $query2->where($column, $criteria[$method][$column]);
+                                if (isset($requestFilters[$method][$column])) {
+                                    $query2->where($column, $requestFilters[$method][$column]);
                                 }
                             }
                         });
                     });
                 }
-            } elseif (array_key_exists($columns, $criteria)) {
-                $query->where($columns, $criteria[$columns]);
+            } elseif (array_key_exists($columns, $requestFilters)) {
+                $query->where($columns, $requestFilters[$columns]);
             }
         }
 
