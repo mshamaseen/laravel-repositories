@@ -26,6 +26,7 @@ class PathResolver
         'Resource' => 'json_resources_path',
         'Collection' => 'json_resources_path',
         'Policy' => 'policies_path',
+        'Test' => 'tests_path'
     ];
 
     public function outputPath(string $type): string
