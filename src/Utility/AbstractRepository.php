@@ -81,12 +81,12 @@ abstract class AbstractRepository implements RepositoryInterface
     /** @return TModel|int|bool */
     public function update(int|string $id, array $data = []): int|bool|EloquentModel
     {
-        return $this->getNewBuilderWithScope()->where('id', $id)->update($data);
+        return $this->getNewBuilderWithScope()->where($this->model->getKeyName(), $id)->update($data);
     }
 
     public function delete(int|string $id = 0): int|bool
     {
-        return $this->getNewBuilderWithScope()->where('id', $id)->delete();
+        return $this->getNewBuilderWithScope()->where($this->model->getKeyName(), $id)->delete();
     }
 
     /**
@@ -122,8 +122,10 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /** @return ?TModel */
-    public function last(string $key = 'id', array $criteria = [], array $columns = ['*']): ?EloquentModel
+    public function last(string $key = null, array $criteria = [], array $columns = ['*']): ?EloquentModel
     {
+        $key = $key ?? $this->model->getKeyName();
+
         return $this->getNewBuilderWithScope()
             ->with($this->with)
             ->searchByCriteria($criteria)
