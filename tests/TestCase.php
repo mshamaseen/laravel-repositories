@@ -2,7 +2,6 @@
 
 namespace Shamaseen\Repository\Tests;
 
-use App\Models\Tests\Test;
 use DirectoryIterator;
 use FilesystemIterator;
 use Shamaseen\Repository\RepositoryServiceProvider;

@@ -70,6 +70,7 @@ class Remover extends Command
         $this->remove('Resource');
         $this->remove('Collection');
         $this->remove('Policy');
+        $this->remove('Test');
 
         RepositoryFilesRemoved::dispatch($this->basePath, $this->userPath, $this->modelName);
 
