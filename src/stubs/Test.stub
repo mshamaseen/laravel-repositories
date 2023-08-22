@@ -3,7 +3,7 @@
 namespace {{namespace}};
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Shamaseen\Repository\Tests\TestCase;
+use Tests\TestCase;
 
 class {{modelName}}Test extends TestCase
 {
