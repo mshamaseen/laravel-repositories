@@ -2,6 +2,8 @@
 
 namespace Shamaseen\Repository\Tests\Feature;
 
+use Illuminate\Support\Facades\Config;
+use Shamaseen\Repository\Commands\Generator;
 use Shamaseen\Repository\PathResolver;
 use Shamaseen\Repository\Tests\TestCase;
 
@@ -51,6 +53,50 @@ class GenerateFilesTest extends TestCase
             $absolutePath = $this->pathResolver->absolutePath($type);
 
             $this->assertFileExists($absolutePath);
+        }
+    }
+
+    public function defaultStubsConfigProvider(): array
+    {
+        return [
+            // run 1
+            [
+                [
+                    Generator::RESOURCE_OPTION
+                ],
+                [
+                    'Resource',
+                ]
+            ],
+            // run 2
+            [
+                [
+                    Generator::RESOURCE_OPTION,
+                    Generator::CONTROLLER_OPTION,
+                ],
+                [
+                    'Controller',
+                    'Resource',
+                ],
+            ],
+        ];
+    }
+
+    /** @dataProvider defaultStubsConfigProvider */
+    public function testDefaultStubsConfig(array $config, array $generatedNames)
+    {
+        Config::set('repository.default_stubs', $config);
+        $this->artisan("generate:repository $this->userPath/$this->modelName -f");
+
+        foreach ($generatedNames as $generatedName) {
+            $this->assertFileExists($this->pathResolver->absolutePath($generatedName));
+        }
+
+        $allGeneratedStubs = array_keys(PathResolver::$configTypePathMap);
+        $filesNotGenerated = array_diff($allGeneratedStubs, $generatedNames);
+
+        foreach ($filesNotGenerated as $fileNotGenerated) {
+            $this->assertFileDoesNotExist($this->pathResolver->absolutePath($fileNotGenerated));
         }
     }
 }

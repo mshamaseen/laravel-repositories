@@ -23,7 +23,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->app->setBasePath(realpath(__DIR__.'/results'));
+        $this->app->setBasePath(realpath(__DIR__).'/results');
+        $this->deletePathIfExists(realpath(__DIR__).'/results');
+        $this->makePathIfNotExist(realpath(__DIR__).'/results');
         $this->alterConfig();
         $this->makePathIfNotExist(config('repository.stubs_path'));
         $this->makePathIfNotExist(config('repository.lang_path'));
@@ -42,11 +44,32 @@ class TestCase extends \Orchestra\Testbench\TestCase
         // perform environment setup
     }
 
-    public function makePathIfNotExist($path)
+    public function makePathIfNotExist(string $path)
     {
         if (!is_dir($path)) {
             mkdir($path, 0775, true);
         }
+    }
+
+    public function deletePathIfExists($dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = scandir($dir);
+        foreach ($files as $file) {
+            if ($file != '.' && $file != '..') {
+                $path = $dir . '/' . $file;
+                if (is_dir($path)) {
+                    $this->deletePathIfExists($path); // Recursively delete subdirectories
+                } else {
+                    unlink($path); // Delete files
+                }
+            }
+        }
+
+        rmdir($dir); // Delete the empty directory
     }
 
     /**

@@ -70,13 +70,10 @@ class Generator extends Command
             && !$this->option(self::MODEL_OPTION) && !$this->option(self::POLICY_OPTION)
             && !$this->option(self::TEST_OPTION)
         ) {
-            $this->input->setOption(self::MODEL_OPTION, true);
-            $this->input->setOption(self::CONTROLLER_OPTION, true);
-            $this->input->setOption(self::RESOURCE_OPTION, true);
-            $this->input->setOption(self::REQUEST_OPTION, true);
-            $this->input->setOption(self::REPOSITORY_OPTION, true);
-            $this->input->setOption(self::POLICY_OPTION, true);
-            $this->input->setOption(self::TEST_OPTION, true);
+            $options = $this->getFileGeneration();
+            foreach ($options as $option) {
+                $this->input->setOption($option, true);
+            }
         }
 
         $paths = preg_split(' ([/\\\]) ', $this->argument('name'));
@@ -219,5 +216,23 @@ class Generator extends Command
     private function dumpAutoload(): void
     {
         shell_exec('composer dump-autoload');
+    }
+
+    public function getFileGeneration(): array {
+        return config('repository.default_stubs');
+    }
+
+    /** @return string[] */
+    public static function getDefaultFileGeneration(): array
+    {
+        return [
+            self::REPOSITORY_OPTION,
+            self::CONTROLLER_OPTION,
+            self::MODEL_OPTION,
+            self::RESOURCE_OPTION,
+            self::POLICY_OPTION,
+            self::REQUEST_OPTION,
+
+        ];
     }
 }

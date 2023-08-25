@@ -51,4 +51,10 @@ return [
      * use filters instead of null here.
      */
     'filter_key' => null,
+
+    /*
+     * This needs to be an array, valid options:
+     * repository, controller, model, transformer, policy, input, test
+     */
+    'default_stubs' => \Shamaseen\Repository\Commands\Generator::getDefaultFileGeneration(),
 ];
