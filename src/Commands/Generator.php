@@ -21,7 +21,7 @@ class Generator extends Command
     public const POLICY_OPTION = 'policy';
     public const REQUEST_OPTION = 'input';
     public const TEST_OPTION = 'test';
-    public const COLLECTION_OPTION= 'collection';
+    public const COLLECTION_OPTION = 'collection';
 
     /**
      * The name and signature of the console command.
