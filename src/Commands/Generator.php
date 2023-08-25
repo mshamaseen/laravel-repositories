@@ -14,13 +14,13 @@ use Shamaseen\Repository\PathResolver;
  */
 class Generator extends Command
 {
-    const REPOSITORY_OPTION = 'repository';
-    const CONTROLLER_OPTION = 'controller';
-    const MODEL_OPTION = 'model';
-    const RESOURCE_OPTION = 'transformer';
-    const POLICY_OPTION = 'policy';
-    const REQUEST_OPTION = 'input';
-    const TEST_OPTION = 'test';
+    public const REPOSITORY_OPTION = 'repository';
+    public const CONTROLLER_OPTION = 'controller';
+    public const MODEL_OPTION = 'model';
+    public const RESOURCE_OPTION = 'transformer';
+    public const POLICY_OPTION = 'policy';
+    public const REQUEST_OPTION = 'input';
+    public const TEST_OPTION = 'test';
 
     /**
      * The name and signature of the console command.
@@ -218,7 +218,8 @@ class Generator extends Command
         shell_exec('composer dump-autoload');
     }
 
-    public function getFileGeneration(): array {
+    public function getFileGeneration(): array
+    {
         return config('repository.default_stubs');
     }
 
