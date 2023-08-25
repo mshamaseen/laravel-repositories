@@ -21,6 +21,7 @@ class Generator extends Command
     public const POLICY_OPTION = 'policy';
     public const REQUEST_OPTION = 'input';
     public const TEST_OPTION = 'test';
+    public const COLLECTION_OPTION= 'collection';
 
     /**
      * The name and signature of the console command.
@@ -35,7 +36,8 @@ class Generator extends Command
     {--m|model : model only}
     {--c|controller : controller only}
     {--r|repository : repository only}
-    {--t|transformer : transformers (API resources) only}
+    {--C|collection : transformer (API collection resource) only}
+    {--t|transformer : transformer (API single resource) only}
     {--p|policy : policy only}
     {--test : test only}
     {--i|input : input validation (request file) only}';
@@ -69,6 +71,7 @@ class Generator extends Command
             && !$this->option(self::REPOSITORY_OPTION) && !$this->option(self::RESOURCE_OPTION)
             && !$this->option(self::MODEL_OPTION) && !$this->option(self::POLICY_OPTION)
             && !$this->option(self::TEST_OPTION)
+            && !$this->option(self::COLLECTION_OPTION)
         ) {
             $options = $this->getFileGeneration();
             foreach ($options as $option) {
@@ -115,6 +118,9 @@ class Generator extends Command
 
         if ($this->option(self::REQUEST_OPTION)) {
             $this->generate('Request', $requestParent);
+        }
+
+        if ($this->option(self::COLLECTION_OPTION)) {
             $this->generate('Collection', $collectionParent);
         }
 
@@ -233,7 +239,7 @@ class Generator extends Command
             self::RESOURCE_OPTION,
             self::POLICY_OPTION,
             self::REQUEST_OPTION,
-
+            self::COLLECTION_OPTION,
         ];
     }
 }

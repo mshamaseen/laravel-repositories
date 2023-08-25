@@ -71,13 +71,31 @@ class GenerateFilesTest extends TestCase
             // run 2
             [
                 [
-                    Generator::RESOURCE_OPTION,
+                    Generator::MODEL_OPTION,
                     Generator::CONTROLLER_OPTION,
                 ],
                 [
+                    'Model',
                     'Controller',
-                    'Resource',
                 ],
+            ],
+            // running Request option should only generate Request
+            [
+                [
+                    Generator::REQUEST_OPTION,
+                ],
+                [
+                    'Request',
+                ]
+            ],
+            // running Collection option should only generate Collection
+            [
+                [
+                    Generator::COLLECTION_OPTION,
+                ],
+                [
+                    'Collection',
+                ]
             ],
         ];
     }

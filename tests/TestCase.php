@@ -25,7 +25,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         parent::setUp();
         $this->app->setBasePath(realpath(__DIR__).'/results');
         $this->deletePathIfExists(realpath(__DIR__).'/results');
-        $this->makePathIfNotExist(realpath(__DIR__).'/results');
+        $this->makePathIfNotExist(realpath(__DIR__).'/results/app');
         $this->alterConfig();
         $this->makePathIfNotExist(config('repository.stubs_path'));
         $this->makePathIfNotExist(config('repository.lang_path'));
