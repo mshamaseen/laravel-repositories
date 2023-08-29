@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CrudTest extends TestCase
 {
-    protected string $modelName = 'Test';
-    protected string $userPath = 'Tests';
-
     /**
      * @param string $dataName
      */
@@ -24,6 +21,14 @@ class CrudTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->artisan("generate:repository $this->userPath/$this->modelName -f");
+        $this->createDatabase();
+    }
+
+    public function tearDown(): void
+    {
+        $this->dropDatabase();
+        parent::tearDown();
     }
 
     public function testIndex()
@@ -37,17 +42,6 @@ class CrudTest extends TestCase
         ]);
     }
 
-    public function testShow()
-    {
-        Route::get('tests/{id}', [TestController::class, 'show']);
-
-        $response = $this->getJson('tests/1');
-
-        $this->assertContains($response->getStatusCode(), [
-            Response::HTTP_OK,
-        ]);
-    }
-
     public function testCreate()
     {
         Route::get('tests/create', [TestController::class, 'create']);
@@ -55,6 +49,22 @@ class CrudTest extends TestCase
         $response = $this->getJson('tests/create');
         $this->assertContains($response->getStatusCode(), [
             Response::HTTP_NO_CONTENT,
+        ]);
+    }
+
+    public function testShow()
+    {
+        $test = Test::create([
+            'name' => 'test name',
+            'type' => 'a test'
+        ]);
+
+        Route::get('tests/{id}', [TestController::class, 'show']);
+
+        $response = $this->getJson('tests/'.$test->id);
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK,
         ]);
     }
 
@@ -81,39 +91,45 @@ class CrudTest extends TestCase
         return $content->id;
     }
 
-    /**
-     * @depends testStore
-     */
-    public function testUpdate(int $id)
+    public function testUpdate()
     {
         Route::put('tests/{id}', [TestController::class, 'update']);
+
+        $test = Test::create([
+            'name' => 'test name',
+            'type' => 'a test'
+        ]);
 
         $data = [
             'name' => 'Update Test',
             'type' => 'Updated',
         ];
 
-        $response = $this->putJson('tests/'.$id, $data);
+        $response = $this->putJson('tests/'.$test->id, $data);
 
         $this->assertContains($response->getStatusCode(), [
             Response::HTTP_OK,
         ]);
 
-        $test = Test::findOrFail($id);
+        $test = Test::findOrFail($test->id);
         $this->assertEquals($data['name'], $test->name);
         $this->assertEquals($data['type'], $test->type);
     }
 
-    /**
-     * @depends testStore
-     */
-    public function testDelete(int $id)
+    public function testDelete()
     {
         Route::delete('tests/{id}', [TestController::class, 'destroy']);
 
-        $response = $this->deleteJson('tests/'.$id);
+        $test = Test::create([
+            'name' => 'test name',
+            'type' => 'a test'
+        ]);
+
+        $response = $this->deleteJson('tests/'.$test->id);
         $this->assertContains($response->getStatusCode(), [
             Response::HTTP_OK,
         ]);
+
+        $this->assertNull(Test::find($test->id));
     }
 }

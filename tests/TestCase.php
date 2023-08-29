@@ -4,11 +4,16 @@ namespace Shamaseen\Repository\Tests;
 
 use DirectoryIterator;
 use FilesystemIterator;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Shamaseen\Repository\RepositoryServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
-    // Shamaseen\Repository\Tests\results\app
+    protected string $databaseName = 'tests';
+    protected string $modelName = 'Test';
+    protected string $userPath = 'Tests';
+
     protected array $configs = [
         'repository.base_path' => 'app',
         'repository.stubs_path' => __DIR__.'/results/resources/stubs',
@@ -88,7 +93,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         // change fillable to guarded for the next test.
-        $path = 'tests/results/resources/stubs/Model.stub';
+        $path = base_path('resources/stubs/Model.stub');
         $modelContent = file_get_contents($path);
         $modelContent = str_replace('$fillable', '$guarded', $modelContent);
         file_put_contents($path, $modelContent);
@@ -99,5 +104,20 @@ class TestCase extends \Orchestra\Testbench\TestCase
         foreach ($this->configs as $key => $value) {
             config()->set($key, $value);
         }
+    }
+
+    public function createDatabase(): void
+    {
+        Schema::create($this->databaseName, function (Blueprint $blueprint) {
+            $blueprint->id();
+            $blueprint->string('name');
+            $blueprint->string('type');
+            $blueprint->timestamps();
+        });
+    }
+
+    public function dropDatabase(): void
+    {
+        Schema::drop($this->databaseName);
     }
 }
