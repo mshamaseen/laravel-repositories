@@ -1,0 +1,40 @@
+name: QA
+
+on:
+  push:
+    branches: [ "main" , "development"]
+  pull_request:
+    branches: [ "main" , "development"]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+#    services:
+#      mysql:
+#        image: mysql
+#        env:
+#          MYSQL_DATABASE: testing
+#          MYSQL_USER: testing
+#          MYSQL_PASSWORD: password
+#          MYSQL_ROOT_PASSWORD: password
+#        ports:
+#          - 3306:3306
+#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: 'PHP Check'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress
+#      - name: PHP Cs Fixer
+#        run: vendor/bin/php-cs-fixer fix --dry-run
+#      - name: Larastan
+#        run: vendor/bin/phpstan analyze
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        run: vendor/bin/phpunit

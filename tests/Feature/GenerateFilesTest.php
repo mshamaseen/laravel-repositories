@@ -14,9 +14,6 @@ class GenerateFilesTest extends TestCase
 
     private array $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection', 'Policy', 'Test'];
 
-    protected string $modelName = 'Test';
-    protected string $userPath = 'Tests';
-
     /**
      * @param string $dataName
      */
