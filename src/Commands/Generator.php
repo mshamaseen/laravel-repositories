@@ -226,6 +226,6 @@ class Generator extends Command
 
     public function getFileGeneration(): array
     {
-        return config('repository.default_stubs');
+        return config('repository.default_generated_files');
     }
 }

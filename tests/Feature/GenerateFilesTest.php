@@ -103,7 +103,7 @@ class GenerateFilesTest extends TestCase
     /** @dataProvider defaultStubsConfigProvider */
     public function testDefaultStubsConfig(array $config, array $generatedNames)
     {
-        Config::set('repository.default_stubs', $config);
+        Config::set('repository.default_generated_files', $config);
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");
 
         foreach ($generatedNames as $generatedName) {

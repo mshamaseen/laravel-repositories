@@ -56,7 +56,7 @@ return [
      * This needs to be an array, valid options:
      * repository, controller, model, transformer, policy, input, test
      */
-    'default_stubs' => [
+    'default_generated_files' => [
         \Shamaseen\Repository\Commands\Generator::REPOSITORY_OPTION,
         \Shamaseen\Repository\Commands\Generator::CONTROLLER_OPTION,
         \Shamaseen\Repository\Commands\Generator::MODEL_OPTION,
