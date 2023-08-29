@@ -7,4 +7,3 @@ composer.lock
 !/tests/results/app/.gitkeep
 /tests/results/resources/*
 !/tests/results/resources/.gitkeep
-tests/sqlite
