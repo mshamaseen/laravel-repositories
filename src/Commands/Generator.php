@@ -228,18 +228,4 @@ class Generator extends Command
     {
         return config('repository.default_stubs');
     }
-
-    /** @return string[] */
-    public static function getDefaultFileGeneration(): array
-    {
-        return [
-            self::REPOSITORY_OPTION,
-            self::CONTROLLER_OPTION,
-            self::MODEL_OPTION,
-            self::RESOURCE_OPTION,
-            self::POLICY_OPTION,
-            self::REQUEST_OPTION,
-            self::COLLECTION_OPTION,
-        ];
-    }
 }
