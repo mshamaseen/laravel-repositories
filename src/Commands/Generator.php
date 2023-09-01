@@ -14,13 +14,14 @@ use Shamaseen\Repository\PathResolver;
  */
 class Generator extends Command
 {
-    const REPOSITORY_OPTION = 'repository';
-    const CONTROLLER_OPTION = 'controller';
-    const MODEL_OPTION = 'model';
-    const RESOURCE_OPTION = 'transformer';
-    const POLICY_OPTION = 'policy';
-    const REQUEST_OPTION = 'input';
-    const TEST_OPTION = 'test';
+    public const REPOSITORY_OPTION = 'repository';
+    public const CONTROLLER_OPTION = 'controller';
+    public const MODEL_OPTION = 'model';
+    public const RESOURCE_OPTION = 'transformer';
+    public const POLICY_OPTION = 'policy';
+    public const REQUEST_OPTION = 'input';
+    public const TEST_OPTION = 'test';
+    public const COLLECTION_OPTION = 'collection';
 
     /**
      * The name and signature of the console command.
@@ -35,7 +36,8 @@ class Generator extends Command
     {--m|model : model only}
     {--c|controller : controller only}
     {--r|repository : repository only}
-    {--t|transformer : transformers (API resources) only}
+    {--C|collection : transformer (API collection resource) only}
+    {--t|transformer : transformer (API single resource) only}
     {--p|policy : policy only}
     {--test : test only}
     {--i|input : input validation (request file) only}';
@@ -69,14 +71,12 @@ class Generator extends Command
             && !$this->option(self::REPOSITORY_OPTION) && !$this->option(self::RESOURCE_OPTION)
             && !$this->option(self::MODEL_OPTION) && !$this->option(self::POLICY_OPTION)
             && !$this->option(self::TEST_OPTION)
+            && !$this->option(self::COLLECTION_OPTION)
         ) {
-            $this->input->setOption(self::MODEL_OPTION, true);
-            $this->input->setOption(self::CONTROLLER_OPTION, true);
-            $this->input->setOption(self::RESOURCE_OPTION, true);
-            $this->input->setOption(self::REQUEST_OPTION, true);
-            $this->input->setOption(self::REPOSITORY_OPTION, true);
-            $this->input->setOption(self::POLICY_OPTION, true);
-            $this->input->setOption(self::TEST_OPTION, true);
+            $options = $this->getFileGeneration();
+            foreach ($options as $option) {
+                $this->input->setOption($option, true);
+            }
         }
 
         $paths = preg_split(' ([/\\\]) ', $this->argument('name'));
@@ -118,6 +118,9 @@ class Generator extends Command
 
         if ($this->option(self::REQUEST_OPTION)) {
             $this->generate('Request', $requestParent);
+        }
+
+        if ($this->option(self::COLLECTION_OPTION)) {
             $this->generate('Collection', $collectionParent);
         }
 
@@ -219,5 +222,10 @@ class Generator extends Command
     private function dumpAutoload(): void
     {
         shell_exec('composer dump-autoload');
+    }
+
+    public function getFileGeneration(): array
+    {
+        return config('repository.default_generated_files');
     }
 }
