@@ -6,10 +6,15 @@ use DirectoryIterator;
 use FilesystemIterator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Shamaseen\Generator\Generator as GeneratorService;
+use Shamaseen\Repository\PathResolver;
 use Shamaseen\Repository\RepositoryServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
+    protected PathResolver $pathResolver;
+    protected GeneratorService $generator;
+
     protected string $databaseName = 'tests';
     protected string $modelName = 'Test';
     protected string $userPath = 'Tests';
@@ -36,6 +41,16 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->makePathIfNotExist(config('repository.stubs_path'));
         $this->makePathIfNotExist(config('repository.lang_path'));
         $this->publishStubs();
+
+
+        $this->generator = $this->app->make(GeneratorService::class);
+
+        // settings the paths that depends on the app base_path explicitly,
+        // that is because they if they run the base_path it will result in a different path than the test result
+        config(['generator.base_path' => base_path(config('repository.base_path'))]);
+        config(['repository.tests_path' => $this->app->basePath('tests/Feature')]);
+
+        $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
 
     protected function getPackageProviders($app): array

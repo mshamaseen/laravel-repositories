@@ -19,7 +19,7 @@ return [
     'requests_path' => 'Http/Requests',
     'json_resources_path' => 'Http/Resources',
     'policies_path' => 'Policies',
-    'tests_path' => 'Tests',
+    'tests_path' => base_path('tests/Feature'),
 
     // Parent classes
     'controller_parent' => 'Shamaseen\Repository\Utility\Controller',

@@ -7,11 +7,6 @@ use Shamaseen\Repository\Tests\TestCase;
 
 class UngenerateFilesTest extends TestCase
 {
-    /**
-     * @var mixed
-     */
-    private PathResolver $pathResolver;
-
     private array $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection', 'Policy', 'Test'];
 
     protected string $modelName = 'Test';
@@ -25,19 +20,13 @@ class UngenerateFilesTest extends TestCase
         parent::__construct($name, $data, $dataName);
     }
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
-    }
-
     public function testUngenerate()
     {
         $this->artisan("ungenerate:repository $this->userPath/$this->modelName")
             ->expectsConfirmation('This will delete Test files and folder, Do you want to continue ?', 'yes');
 
         foreach ($this->filesToGenerate as $type) {
-            $outputPath = $this->pathResolver->absolutePath($type);
+            $outputPath = $this->generator->absolutePath($this->pathResolver->outputPath($type));
             $this->assertFileDoesNotExist($outputPath);
         }
     }

@@ -9,11 +9,6 @@ use Shamaseen\Repository\Tests\TestCase;
 
 class GenerateFilesTest extends TestCase
 {
-    /**
-     * @var mixed
-     */
-    private PathResolver $pathResolver;
-
     private array $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection', 'Policy', 'Test'];
 
     /**
@@ -24,18 +19,14 @@ class GenerateFilesTest extends TestCase
         parent::__construct($name, $data, $dataName);
     }
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
-    }
-
     public function testGenerate()
     {
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");
 
         foreach ($this->filesToGenerate as $type) {
-            $absolutePath = $this->pathResolver->absolutePath($type);
+            $absolutePath = $this->generator->absolutePath(
+                $this->pathResolver->outputPath($type)
+            );
 
             $this->assertFileExists($absolutePath);
         }
@@ -47,7 +38,9 @@ class GenerateFilesTest extends TestCase
 
         $filesToGenerate = ['Controller', 'Repository', 'Model'];
         foreach ($filesToGenerate as $type) {
-            $absolutePath = $this->pathResolver->absolutePath($type);
+            $absolutePath = $this->generator->absolutePath(
+                $this->pathResolver->outputPath($type)
+            );
 
             $this->assertFileExists($absolutePath);
         }
@@ -104,14 +97,18 @@ class GenerateFilesTest extends TestCase
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");
 
         foreach ($generatedNames as $generatedName) {
-            $this->assertFileExists($this->pathResolver->absolutePath($generatedName));
+            $this->assertFileExists($this->generator->absolutePath(
+                $this->pathResolver->outputPath($generatedName)
+            ));
         }
 
         $allGeneratedStubs = array_keys(PathResolver::$configTypePathMap);
         $filesNotGenerated = array_diff($allGeneratedStubs, $generatedNames);
 
         foreach ($filesNotGenerated as $fileNotGenerated) {
-            $this->assertFileDoesNotExist($this->pathResolver->absolutePath($fileNotGenerated));
+            $this->assertFileDoesNotExist($this->generator->absolutePath(
+                $this->pathResolver->outputPath($fileNotGenerated)
+            ));
         }
     }
 }

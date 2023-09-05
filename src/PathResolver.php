@@ -41,11 +41,6 @@ class PathResolver
         return $this->typePath($type).$this->pathSection($this->userPath);
     }
 
-    public function absolutePath($type): string
-    {
-        return base_path($this->basePath.'/'.$this->outputPath($type));
-    }
-
     public function pathSection(?string $section): string
     {
         return $section ? '/'.$section : '';
