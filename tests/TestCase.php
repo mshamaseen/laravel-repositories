@@ -28,8 +28,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->app->setBasePath(realpath(__DIR__).'/results');
-        $this->deletePathIfExists(realpath(__DIR__).'/results');
+        $this->deletePathContentsIfExists(realpath(__DIR__).'/results');
         $this->makePathIfNotExist(realpath(__DIR__).'/results/app');
         $this->alterConfig();
         $this->makePathIfNotExist(config('repository.stubs_path'));
@@ -56,7 +57,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         }
     }
 
-    public function deletePathIfExists($dir)
+    public function deletePathContentsIfExists($dir): void
     {
         if (!is_dir($dir)) {
             return;
@@ -64,17 +65,15 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $files = scandir($dir);
         foreach ($files as $file) {
-            if ($file != '.' && $file != '..') {
+            if ($file[0] != '.') {
                 $path = $dir . '/' . $file;
                 if (is_dir($path)) {
-                    $this->deletePathIfExists($path); // Recursively delete subdirectories
+                    $this->deletePathContentsIfExists($path); // Recursively delete subdirectories
                 } else {
                     unlink($path); // Delete files
                 }
             }
         }
-
-        rmdir($dir); // Delete the empty directory
     }
 
     /**

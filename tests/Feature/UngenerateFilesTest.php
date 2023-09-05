@@ -12,7 +12,7 @@ class UngenerateFilesTest extends TestCase
      */
     private PathResolver $pathResolver;
 
-    private array $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection', 'Policy'];
+    private array $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection', 'Policy', 'Test'];
 
     protected string $modelName = 'Test';
     protected string $userPath = 'Tests';
