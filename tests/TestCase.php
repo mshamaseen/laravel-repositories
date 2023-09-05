@@ -20,14 +20,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected string $userPath = 'Tests';
 
     protected array $configs = [
-        'repository.base_path' => 'app',
         'repository.stubs_path' => __DIR__.'/results/resources/stubs',
         'repository.lang_path' => __DIR__.'/results/resources/lang',
-        'repository.controllers_path' => 'Http/Controllers',
-        'repository.repositories_path' => 'Repositories',
-        'repository.models_path' => 'Models',
-        'repository.requests_path' => 'Http/Requests',
-        'repository.json_resources_path' => 'Http/Resources',
     ];
 
     public function setUp(): void
@@ -44,11 +38,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
 
         $this->generator = $this->app->make(GeneratorService::class);
-
-        // settings the paths that depends on the app base_path explicitly,
-        // that is because they if they run the base_path it will result in a different path than the test result
         config(['generator.base_path' => base_path(config('repository.base_path'))]);
-        config(['repository.tests_path' => $this->app->basePath('tests/Feature')]);
 
         $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
