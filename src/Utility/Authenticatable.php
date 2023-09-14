@@ -25,7 +25,7 @@ class Authenticatable extends LaravelUser implements CriteriableModelInterface
     use Criteriable;
     use CachePerRequest;
 
-    protected array $dates = [
+    protected $dates = [
         'created_at',
         'updated_at',
     ];
