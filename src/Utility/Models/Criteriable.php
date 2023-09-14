@@ -70,12 +70,10 @@ trait Criteriable
 
         return $query;
     }
-
     private function buildMatchAgainst($query, array $columns, $search)
     {
         return $query->whereRaw('MATCH('.implode(',', $columns).') AGAINST (? '.$this->fullTextSearchMode.')', $search);
     }
-
     public function scopeSearchByCriteria($query, array $criteria): Builder
     {
         if (!isset($criteria['search'])) {
@@ -103,17 +101,22 @@ trait Criteriable
                         $query->where(function ($query2) use ($criteria, $columns) {
                             /* @var $query2 Builder */
                             foreach ((array) $columns as $column) {
-                                $query2->orWhere($column, 'like', $criteria['search'].'%');
+                                $this->searchByCriteriaQueryPerColumn($query2, $column, $criteria['search']);
                             }
                         });
                     });
                 } else {
-                    $q->orWhere($columns, 'like', $criteria['search'].'%');
+                    $this->searchByCriteriaQueryPerColumn($q, $columns, $criteria['search']);
                 }
             }
         });
 
         return $query;
+    }
+
+    protected function searchByCriteriaQueryPerColumn(Builder $query, string $column, string $search): void
+    {
+        $query->orWhere($column, 'like', $search.'%');
     }
 
     public function scopeOrderByCriteria($query, array $criteria): Builder
