@@ -6,7 +6,11 @@ Models are the middleware between the application and the database, you should d
 
 Request cache allow you to cache queries results for the current request, it uses the **array** driver to cache the results per each request.
 
+### Disable Cache
+
 You can disable caching for the current model by setting the `$requestCacheEnabled` property to false.
+
+You may totally disable the cache using the setting `disable_cache` in the package's config file.
 
 ### Runtime cache manipulation
 
