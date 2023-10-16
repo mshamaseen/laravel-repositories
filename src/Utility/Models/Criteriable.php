@@ -21,6 +21,7 @@ trait Criteriable
     protected ?array $filterables = null;
     protected ?array $sortables = null;
     protected string $fullTextSearchMode = '';
+    protected bool $fullTextSearchExpansion = false;
 
     /**
      * @var array<array<string>>
@@ -71,25 +72,25 @@ trait Criteriable
         return $query;
     }
 
-    private function buildMatchAgainst($query, array $columns, $search)
-    {
-        return $query->whereRaw('MATCH('.implode(',', $columns).') AGAINST (? '.$this->fullTextSearchMode.')', $search);
-    }
-
     public function scopeSearchByCriteria($query, array $criteria): Builder
     {
         if (!isset($criteria['search'])) {
             return $query;
         }
 
-        $query->where(function ($q) use ($criteria) {
+        $fullTextOptions = [
+            'mode' => $this->fullTextSearchMode,
+            'expanded' => $this->fullTextSearchExpansion
+        ];
+
+        $query->where(function ($q) use ($criteria, $fullTextOptions) {
             foreach ($this->fulltextSearch as $method => $columns) {
                 if (method_exists($this, $method)) {
-                    $q->orWhereHas($method, function ($q2) use ($criteria, $columns) {
-                        $this->buildMatchAgainst($q2, $columns, $criteria['search']);
+                    $q->orWhereHas($method, function ($q2) use ($criteria, $columns, $fullTextOptions) {
+                        $q2->whereFullText($columns, $criteria['search'], $fullTextOptions);
                     });
                 } else {
-                    $this->buildMatchAgainst($q, $columns, $criteria['search']);
+                    $q->whereFullText($columns, $criteria['search'], $fullTextOptions);
                 }
             }
 
@@ -103,17 +104,22 @@ trait Criteriable
                         $query->where(function ($query2) use ($criteria, $columns) {
                             /* @var $query2 Builder */
                             foreach ((array) $columns as $column) {
-                                $query2->orWhere($column, 'like', $criteria['search'].'%');
+                                $this->searchByCriteriaQueryPerColumn($query2, $column, $criteria['search']);
                             }
                         });
                     });
                 } else {
-                    $q->orWhere($columns, 'like', $criteria['search'].'%');
+                    $this->searchByCriteriaQueryPerColumn($q, $columns, $criteria['search']);
                 }
             }
         });
 
         return $query;
+    }
+
+    protected function searchByCriteriaQueryPerColumn(Builder $query, string $column, string $search): void
+    {
+        $query->orWhere($column, 'like', $search.'%');
     }
 
     public function scopeOrderByCriteria($query, array $criteria): Builder

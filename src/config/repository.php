@@ -10,19 +10,19 @@ return [
     'lang_path' => '../resources/lang',
 
     // base path to all relative paths, absolute paths wil ignore the base file.
-    'base_path' => 'app', // relative to project directory, DON'T USE 1- absolute paths here or 2- laravel path functions.
+    'base_path' => '', // relative to project directory, DON'T USE 1- absolute paths here or 2- laravel path functions.
 
     // this is an example of absolute path, which means base path will have no effect on it.
     'stubs_path' => __DIR__.'/../resources/stubs',
 
-    // Relative paths
-    'controllers_path' => 'Http/Controllers',
-    'repositories_path' => 'Repositories',
-    'models_path' => 'Models',
-    'requests_path' => 'Http/Requests',
-    'json_resources_path' => 'Http/Resources',
-    'policies_path' => 'Policies',
-    'tests_path' => 'Tests',
+    // Relative paths - these must be relative to path roots
+    'controllers_path' => 'app/Http/Controllers',
+    'repositories_path' => 'app/Repositories',
+    'models_path' => 'app/Models',
+    'requests_path' => 'app/Http/Requests',
+    'json_resources_path' => 'app/Http/Resources',
+    'policies_path' => 'app/Policies',
+    'tests_path' => 'tests/Feature',
 
     // Parent classes
     'controller_parent' => 'Shamaseen\Repository\Utility\Controller',

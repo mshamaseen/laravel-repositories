@@ -6,35 +6,41 @@ use DirectoryIterator;
 use FilesystemIterator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Shamaseen\Generator\Generator as GeneratorService;
+use Shamaseen\Repository\PathResolver;
 use Shamaseen\Repository\RepositoryServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
+    protected PathResolver $pathResolver;
+    protected GeneratorService $generator;
+
     protected string $databaseName = 'tests';
     protected string $modelName = 'Test';
     protected string $userPath = 'Tests';
 
     protected array $configs = [
-        'repository.base_path' => 'app',
         'repository.stubs_path' => __DIR__.'/results/resources/stubs',
         'repository.lang_path' => __DIR__.'/results/resources/lang',
-        'repository.controllers_path' => 'Http/Controllers',
-        'repository.repositories_path' => 'Repositories',
-        'repository.models_path' => 'Models',
-        'repository.requests_path' => 'Http/Requests',
-        'repository.json_resources_path' => 'Http/Resources',
     ];
 
     public function setUp(): void
     {
         parent::setUp();
+
         $this->app->setBasePath(realpath(__DIR__).'/results');
-        $this->deletePathIfExists(realpath(__DIR__).'/results');
+        $this->deletePathContentsIfExists(realpath(__DIR__).'/results');
         $this->makePathIfNotExist(realpath(__DIR__).'/results/app');
         $this->alterConfig();
         $this->makePathIfNotExist(config('repository.stubs_path'));
         $this->makePathIfNotExist(config('repository.lang_path'));
         $this->publishStubs();
+
+
+        $this->generator = $this->app->make(GeneratorService::class);
+        config(['generator.base_path' => base_path(config('repository.base_path'))]);
+
+        $this->pathResolver = new PathResolver($this->modelName, $this->userPath, config('repository.base_path'));
     }
 
     protected function getPackageProviders($app): array
@@ -56,7 +62,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         }
     }
 
-    public function deletePathIfExists($dir)
+    public function deletePathContentsIfExists($dir): void
     {
         if (!is_dir($dir)) {
             return;
@@ -64,17 +70,15 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $files = scandir($dir);
         foreach ($files as $file) {
-            if ($file != '.' && $file != '..') {
+            if ($file[0] != '.') {
                 $path = $dir . '/' . $file;
                 if (is_dir($path)) {
-                    $this->deletePathIfExists($path); // Recursively delete subdirectories
+                    $this->deletePathContentsIfExists($path); // Recursively delete subdirectories
                 } else {
                     unlink($path); // Delete files
                 }
             }
         }
-
-        rmdir($dir); // Delete the empty directory
     }
 
     /**

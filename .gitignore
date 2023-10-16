@@ -4,6 +4,6 @@ composer.lock
 .DS_Store
 .phpunit.result.cache
 /tests/results/app/*
-!/tests/results/app/.gitkeep
 /tests/results/resources/*
+!/tests/results/app/.gitkeep
 !/tests/results/resources/.gitkeep
