@@ -27,6 +27,10 @@ class ConnectionProxy implements ConnectionInterface
      */
     public function cacheOrNext($fullQuery, callable $next)
     {
+        if(config('repository.disable_cache')) {
+            return $next();
+        }
+
         if ($this->model->requestCacheEnabled) {
             $cache = $this->model->requestCache;
 
