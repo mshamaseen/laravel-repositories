@@ -50,7 +50,7 @@ abstract class AbstractRepository implements RepositoryInterface
             ->orderByCriteria($criteria)
             ->searchByCriteria($criteria)
             ->filterByCriteria($criteria)
-            ->paginate($limit);
+            ->paginate($limit)->withQueryString();
     }
 
     /** @return Paginator<TModel> */
