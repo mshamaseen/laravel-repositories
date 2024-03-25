@@ -3,6 +3,9 @@
 // we are not using realpath function here because it will not allow the tests to run.
 
 return [
+    // global cache disable, if you use this option all the caches will be disabled
+    // can't be overriden by the scopes.
+    'disable_cache' => false,
     // we need this to publish language files
     'lang_path' => '../resources/lang',
 
