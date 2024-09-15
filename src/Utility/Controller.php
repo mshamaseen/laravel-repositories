@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -124,7 +125,7 @@ class Controller extends LaravelController
     /**
      * Display a listing of the model.
      */
-    public function index(): View|JsonResponse
+    public function index(): View|JsonResponse|\Illuminate\Http\Resources\Json\ResourceCollection
     {
         $this->breadcrumbs->put('index', [
             'link' => $this->resolveRoute($this->routeIndex),
@@ -143,7 +144,7 @@ class Controller extends LaravelController
     /**
      * Display the specified resource.
      */
-    public function show(int|string $entityId): View|JsonResponse
+    public function show(int|string $entityId): View|JsonResponse|JsonResource
     {
         $this->breadcrumbs->put('view', [
             'link' => '',
@@ -158,7 +159,7 @@ class Controller extends LaravelController
     /**
      * Show the form to create a new resource, only for web responses.
      */
-    public function create(): View|JsonResponse
+    public function create(): View|JsonResponse|JsonResource
     {
         $this->breadcrumbs->put('create', [
             'link' => $this->resolveRoute($this->createRoute),
@@ -171,7 +172,7 @@ class Controller extends LaravelController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(): JsonResponse|RedirectResponse
+    public function store(): JsonResponse|RedirectResponse|JsonResource
     {
         $entity = $this->repository->create($this->request->except(['_token', '_method']));
 
@@ -181,7 +182,7 @@ class Controller extends LaravelController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int|string $entityId): View|JsonResponse
+    public function edit(int|string $entityId): View|JsonResponse|JsonResource
     {
         $this->breadcrumbs->put('edit', [
             'link' => '',
@@ -196,7 +197,7 @@ class Controller extends LaravelController
     /**
      * Update the specified resource in storage.
      */
-    public function update(int|string $entityId): JsonResponse|RedirectResponse
+    public function update(int|string $entityId): JsonResponse|RedirectResponse|JsonResource
     {
         $updatedCount = $this->repository->update($entityId, $this->request->except(['_token', '_method']));
 
@@ -208,7 +209,7 @@ class Controller extends LaravelController
      *
      * @throws Exception
      */
-    public function destroy(int|string $entityId): JsonResponse|RedirectResponse
+    public function destroy(int|string $entityId): JsonResponse|RedirectResponse|JsonResource
     {
         $deletedCount = $this->repository->delete($entityId);
 
