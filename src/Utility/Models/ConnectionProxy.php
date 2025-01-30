@@ -189,4 +189,9 @@ class ConnectionProxy implements ConnectionInterface
             $this->realConnection->getPostProcessor()
         );
     }
+
+    public function scalar($query, $bindings = [], $useReadPdo = true)
+    {
+        return $this->scalar($query, $bindings, $useReadPdo);
+    }
 }

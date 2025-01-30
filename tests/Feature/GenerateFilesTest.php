@@ -46,7 +46,7 @@ class GenerateFilesTest extends TestCase
         }
     }
 
-    public function defaultStubsConfigProvider(): array
+    public static function defaultStubsConfigProvider(): array
     {
         return [
             // run 1

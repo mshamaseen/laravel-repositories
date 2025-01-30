@@ -5,6 +5,7 @@ Via composer:
 composer require shamaseen/laravel-repositories
 ```
 
+For Laravel 10 or bellow, use version `2.*` of this package.
 
 **Optional:** to publish the repository config file
 ```
