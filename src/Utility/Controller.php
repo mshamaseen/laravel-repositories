@@ -125,7 +125,7 @@ class Controller extends LaravelController
     /**
      * Display a listing of the model.
      */
-    public function index(): View|JsonResponse|\Illuminate\Http\Resources\Json\ResourceCollection
+    public function index(): mixed
     {
         $this->breadcrumbs->put('index', [
             'link' => $this->resolveRoute($this->routeIndex),
@@ -144,7 +144,7 @@ class Controller extends LaravelController
     /**
      * Display the specified resource.
      */
-    public function show(int|string $entityId): View|JsonResponse|JsonResource
+    public function show(int|string $entityId): mixed
     {
         $this->breadcrumbs->put('view', [
             'link' => '',
@@ -159,7 +159,7 @@ class Controller extends LaravelController
     /**
      * Show the form to create a new resource, only for web responses.
      */
-    public function create(): View|JsonResponse|JsonResource
+    public function create(): mixed
     {
         $this->breadcrumbs->put('create', [
             'link' => $this->resolveRoute($this->createRoute),
@@ -172,7 +172,7 @@ class Controller extends LaravelController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(): JsonResponse|RedirectResponse|JsonResource
+    public function store(): mixed
     {
         $entity = $this->repository->create($this->request->except(['_token', '_method']));
 
@@ -182,7 +182,7 @@ class Controller extends LaravelController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int|string $entityId): View|JsonResponse|JsonResource
+    public function edit(int|string $entityId): mixed
     {
         $this->breadcrumbs->put('edit', [
             'link' => '',
@@ -197,7 +197,7 @@ class Controller extends LaravelController
     /**
      * Update the specified resource in storage.
      */
-    public function update(int|string $entityId): JsonResponse|RedirectResponse|JsonResource
+    public function update(int|string $entityId): mixed
     {
         $updatedCount = $this->repository->update($entityId, $this->request->except(['_token', '_method']));
 
@@ -209,7 +209,7 @@ class Controller extends LaravelController
      *
      * @throws Exception
      */
-    public function destroy(int|string $entityId): JsonResponse|RedirectResponse|JsonResource
+    public function destroy(int|string $entityId): mixed
     {
         $deletedCount = $this->repository->delete($entityId);
 
