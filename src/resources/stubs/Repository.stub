@@ -11,7 +11,7 @@ use {{ModelNamespace}}\{{modelName}};
  */
 class {{modelName}}Repository extends AbstractRepository
 {
-    protected array $with = [];
+    public array $with = [];
 
     /**
      * @return string
