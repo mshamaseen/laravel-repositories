@@ -3,6 +3,7 @@
 namespace Shamaseen\Repository\Tests\Feature;
 
 use Illuminate\Support\Facades\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Shamaseen\Repository\Commands\Generator;
 use Shamaseen\Repository\PathResolver;
 use Shamaseen\Repository\Tests\TestCase;
@@ -90,7 +91,7 @@ class GenerateFilesTest extends TestCase
         ];
     }
 
-    /** @dataProvider defaultStubsConfigProvider */
+    #[DataProvider('defaultStubsConfigProvider')]
     public function testDefaultStubsConfig(array $config, array $generatedNames)
     {
         Config::set('repository.default_generated_files', $config);
