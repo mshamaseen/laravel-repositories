@@ -28,7 +28,7 @@
     "require": {
         "php": ">=8.2",
         "shamaseen/laravel-files-generator": "^0.5",
-        "laravel/framework": "11.*"
+        "laravel/framework": "12.*"
     },
     "require-dev": {
         "doctrine/dbal": ">2.8",

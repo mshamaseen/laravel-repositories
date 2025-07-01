@@ -63,25 +63,6 @@ class ConnectionProxy implements ConnectionInterface
         });
     }
 
-        /**
-     * Run a select statement and return the first column of the first row.
-     *
-     * @param  string  $query
-     * @param  array  $bindings
-     * @param  bool  $useReadPdo
-     * @return mixed
-     *
-     * @throws \Illuminate\Database\MultipleColumnsSelectedException
-     */
-    public function scalar($query, $bindings = [], $useReadPdo = true)
-    {
-        $fullQuery = Str::replaceArray('?', $bindings, $query);
-
-        return $this->cacheOrNext($fullQuery, function () use ($query, $bindings, $useReadPdo) {
-            return $this->realConnection->scalar($query, $bindings, $useReadPdo);
-        });
-    }
-
     /**
      * @throws InvalidArgumentException
      */
