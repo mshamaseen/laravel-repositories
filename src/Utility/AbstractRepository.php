@@ -40,7 +40,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /** @return class-string<TModel> */
     abstract public function getModelClass(): string;
 
-    /** @return LengthAwarePaginator<TModel> */
+    /** @return LengthAwarePaginator<(int|string), TModel> */
     public function paginate(int $limit = 10, array $criteria = []): LengthAwarePaginator
     {
         $this->injectDefaultCriteria($criteria);
