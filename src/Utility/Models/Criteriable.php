@@ -24,7 +24,7 @@ trait Criteriable
     protected bool $fullTextSearchExpansion = false;
 
     /**
-     * @var array<array<string>>
+     * @var string[]|array<string, string[]>
      */
     protected ?array $fulltextSearch = [];
 
