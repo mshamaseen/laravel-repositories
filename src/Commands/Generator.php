@@ -136,7 +136,7 @@ class Generator extends Command
             $this->generate('Policy');
         }
 
-        if ($this->option(self::POLICY_OPTION)) {
+        if ($this->option(self::TEST_OPTION)) {
             $this->generate('Test');
         }
 

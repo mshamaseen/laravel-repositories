@@ -67,5 +67,6 @@ return [
         \Shamaseen\Repository\Commands\Generator::POLICY_OPTION,
         \Shamaseen\Repository\Commands\Generator::REQUEST_OPTION,
         \Shamaseen\Repository\Commands\Generator::COLLECTION_OPTION,
+        \Shamaseen\Repository\Commands\Generator::TEST_OPTION,
     ],
 ];
