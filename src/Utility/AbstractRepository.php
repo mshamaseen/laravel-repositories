@@ -122,7 +122,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /** @return ?TModel */
-    public function last(string $key = null, array $criteria = [], array $columns = ['*']): ?EloquentModel
+    public function last(string|null $key = null, array $criteria = [], array $columns = ['*']): ?EloquentModel
     {
         $key = $key ?? $this->model->getKeyName();
 
