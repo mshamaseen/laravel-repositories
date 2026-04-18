@@ -102,14 +102,14 @@ class Controller extends LaravelController
         $this->authorizeAction($method);
 
         $this->isAPI = $this->request->expectsJson();
-        $this->limit = min($this->request->get('limit', $this->limit), $this->maxLimit);
+        $this->limit = min($this->request->input('limit', $this->limit), $this->maxLimit);
 
         if ($this->allowTrashRequest) {
-            if ($this->request->get('with-trash', false)) {
+            if ($this->request->input('with-trash', false)) {
                 $this->repository->withTrash();
             }
 
-            if ($this->request->get('only-trash', false)) {
+            if ($this->request->input('only-trash', false)) {
                 $this->repository->onlyTrash();
             }
         }
