@@ -119,7 +119,7 @@ trait Criteriable
 
     protected function searchByCriteriaQueryPerColumn(Builder $query, string $column, string $search): void
     {
-        $query->orWhere($column, 'like', $search.'%');
+        $query->orWhere($column, 'like', '%'.$search.'%');
     }
 
     public function scopeOrderByCriteria($query, array $criteria): Builder
