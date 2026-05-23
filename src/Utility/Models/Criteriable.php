@@ -18,6 +18,16 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
  */
 trait Criteriable
 {
+    protected array $allowedFilterOperators = [
+        'eq' => '=',
+        'lt' => '<',
+        'gt' => '>',
+        'lte' => '<=',
+        'gte' => '>=',
+        'ne' => '!=',
+//        for future support
+//        'like', 'not like', 'in', 'not in', 'between', 'not between'
+    ];
     protected ?array $searchables = null;
     protected ?array $filterables = null;
     protected ?array $sortables = null;
@@ -48,13 +58,28 @@ trait Criteriable
     public function scopeFilterByCriteria(Builder $query, array $criteria): Builder
     {
         $requestFilters = $this->getFiltersFromCriteria($criteria);
-
         foreach ($this->getFilterables() as $method => $columns) {
-            // if this is associative then it is a relation
+            // if the model filterable member is an associative array then it is a relation
             if ('string' === gettype($method)) {
                 $this->filterByRelation($query, $method, $columns, $requestFilters);
             } elseif (array_key_exists($columns, $requestFilters)) {
-                $query->where($columns, $requestFilters[$columns]);
+                $requestField = $requestFilters[$columns];
+                if(is_string($requestField)) {
+                    $query->where($columns, $requestFilters[$columns]);
+                } elseif(is_array($requestField)) {
+                    $this->tryToFilterByOperator($query, $columns, $requestField);
+                }
+            }
+        }
+
+        return $query;
+    }
+
+    protected function tryToFilterByOperator(Builder $query, string $column, array $requestField): Builder
+    {
+        foreach ($requestField as $operator => $value) {
+            if (array_key_exists($operator, $this->allowedFilterOperators)) {
+                $query->where($column, $this->allowedFilterOperators[$operator], $value);
             }
         }
 

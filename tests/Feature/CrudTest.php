@@ -71,6 +71,39 @@ class CrudTest extends TestCase
         $response->assertJsonCount(2, 'data');
     }
 
+    public function testFilterWithEqualOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?type[eq]=Type1');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testFilterWithGreaterOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->travel(2)->months();
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?created_at[gt]='.now()->subMonth()->format('Y-m-d'));
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
     public function testSort()
     {
         Route::get('tests', [TestController::class, 'index']);
