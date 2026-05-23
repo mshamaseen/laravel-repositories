@@ -1,0 +1,18 @@
+<?php
+
+namespace {{namespace}};
+
+use {{parentClass}} as Model;
+
+/**
+ * Class {{modelName}}.
+ */
+class {{modelName}} extends Model
+{
+    /*
+    * Fill in your fillables here
+    */
+    protected $guarded = [];
+
+    protected ?array $searchables = ['name'];
+}

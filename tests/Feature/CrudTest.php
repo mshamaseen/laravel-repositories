@@ -13,8 +13,9 @@ class CrudTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        config(['repository.stubs_path' => __DIR__.'/../stubs']);
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");
-        $this->createDatabase();
+        $this->createTable();
     }
 
     public function tearDown(): void
@@ -27,11 +28,31 @@ class CrudTest extends TestCase
     {
         Route::get('tests', [TestController::class, 'index']);
 
+        $this->generateModels(count: 5);
+
         $response = $this->getJson('tests');
 
         $this->assertContains($response->getStatusCode(), [
             Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
         ]);
+
+        $response->assertjsonCount(5, 'data');
+    }
+
+    public function testSearch()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type1'], count: 5);
+        Test::query()->create(['name' => 'mytest', 'type' => 'Type1']);
+
+        $response = $this->getJson('tests?search=mytest');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertjsonCount(1, 'data');
     }
 
     public function testCreate()

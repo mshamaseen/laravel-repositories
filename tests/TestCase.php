@@ -5,6 +5,7 @@ namespace Shamaseen\Repository\Tests;
 use DirectoryIterator;
 use FilesystemIterator;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Shamaseen\Generator\Generator as GeneratorService;
 use Shamaseen\Repository\PathResolver;
@@ -15,7 +16,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected PathResolver $pathResolver;
     protected GeneratorService $generator;
 
-    protected string $databaseName = 'tests';
+    protected string $table = 'tests';
     protected string $modelName = 'Test';
     protected string $userPath = 'Tests';
 
@@ -110,9 +111,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
         }
     }
 
-    public function createDatabase(): void
+    public function createTable(): void
     {
-        Schema::create($this->databaseName, function (Blueprint $blueprint) {
+        Schema::create($this->table, function (Blueprint $blueprint) {
             $blueprint->id();
             $blueprint->string('name');
             $blueprint->string('type');
@@ -122,6 +123,21 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     public function dropDatabase(): void
     {
-        Schema::drop($this->databaseName);
+        Schema::drop($this->table);
+    }
+
+    protected function generateModels(array|null $data = null, int $count = 1): Collection
+    {
+        $data ??= [
+            'name' => fake()->name,
+            'type' => fake()->randomElement(['Type1', 'Type2']),
+        ];
+
+        $models = collect();
+        foreach (range(1, $count) as $i) {
+            $models->push(\App\Models\Tests\Test::query()->create($data));
+        }
+
+        return $models;
     }
 }
