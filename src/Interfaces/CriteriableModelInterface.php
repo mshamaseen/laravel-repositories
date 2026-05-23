@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Builder;
  */
 interface CriteriableModelInterface
 {
-    public function scopeFilterByCriteria($query, array $criteria): Builder;
+    public function scopeFilterByCriteria(Builder $query, array $criteria): Builder;
 
-    public function scopeSearchByCriteria($query, array $criteria): Builder;
+    public function scopeSearchByCriteria(Builder $query, array $criteria): Builder;
 
-    public function scopeOrderByCriteria($query, array $criteria): Builder;
+    public function scopeOrderByCriteria(Builder $query, array $criteria): Builder;
 }
