@@ -1,120 +1,349 @@
 # Model
 
-Models are the middleware between the application and the database, you should define all the relations, getter/setter attributes, and anything related to the database in there.
+`Shamaseen\Repository\Utility\Model` is the base Eloquent model every generated model extends. It composes two traits that add per-request caching and criteria-driven query scopes to every model in your application.
 
-## Request Cache
+```php
+use Shamaseen\Repository\Utility\Model;
 
-Request cache allow you to cache queries results for the current request, it uses the **array** driver to cache the results per each request.
+class Post extends Model
+{
+    protected $fillable = ['title', 'body', 'status'];
+}
+```
 
-### Disable Cache
+---
 
-You can disable caching for the current model by setting the `$requestCacheEnabled` property to false.
+## CachePerRequest
 
-You may totally disable the cache using the setting `disable_cache` in the package's config file.
+The `CachePerRequest` trait caches SELECT query results for the lifetime of the current HTTP request using Laravel's built-in `array` cache driver. Identical queries (same SQL + bindings) executed more than once within the same request are served from memory instead of hitting the database again.
+
+### How it works
+
+The trait replaces the model's database connection with a thin `ConnectionProxy`. Every `select` / `selectOne` call builds a cache key from the fully-resolved SQL string. On a cache hit the result is returned immediately; on a miss the real query runs and the result is stored before being returned.
+
+### Disabling cache globally
+
+Set `disable_cache` to `true` in `config/repository.php` to turn off caching for every model. This flag cannot be overridden at runtime and is useful for testing environments.
+
+```php
+// config/repository.php
+'disable_cache' => true,
+```
+
+### Disabling cache per model
+
+Set the `$requestCacheEnabled` property to `false` on a specific model to opt it out of caching entirely.
+
+```php
+class AuditLog extends Model
+{
+    public bool $requestCacheEnabled = false;
+}
+```
 
 ### Runtime cache manipulation
 
-You can disable\enable\clear the cache on real time for specific builder by calling these methods:
+Three chainable query scopes let you control caching on a per-query basis:
 
-```
-Model::DisableCache();
-Model::EnableCache();
-Model::ClearCache();
-```
+| Scope | Effect |
+|---|---|
+| `disableCache()` | Turns off caching for subsequent queries on this builder |
+| `enableCache()` | Turns caching back on |
+| `clearCache()` | Wipes the in-memory cache store for this model |
 
-These methods are chainable, meaning that you can call them while building your query:
-```
-Model::DisableCache()->where('name', 'Mohammad')->get();
-```
+```php
+// Run a query without using or storing the cache
+$posts = Post::disableCache()->where('status', 'draft')->get();
 
-## Criteria Scopes
+// Clear stale cache entries then re-query
+$posts = Post::clearCache()->where('status', 'published')->get();
 
-Most of the time you want to search your query base on the front-end criteria, we have built a common used methods to filter/search/order by criteria and add them as a [query scopes](https://laravel.com/docs/9.x/eloquent#query-scopes).
-
-
-These methods are:
-```
-Model::filterByCriteria($criteria);
-Model::searchByCriteria($criteria);
-Model::orderByCriteria($criteria);
+// Chain with any other builder methods
+Post::disableCache()->where('user_id', $userId)->orderBy('created_at')->get();
 ```
 
-Only `fillables` are filterable/searchable by default, to override this behavior, define `$searchables` or `$filterables` or `$sortables` properties in your model and fill it with the desired columns.
+> **Note:** `refresh()` on a model instance automatically bypasses the cache so the reloaded attributes always reflect the current database state.
 
-### Fulltext search
+---
 
-If you want to use fulltext search instead of `like` search, you should define your fulltext columns in the `fulltextSearch` array in your model:
+## Criteriable
 
-```
-    protected ?array $fulltextSearch = [
-        [
-            'firstname', 'lastname',
-        ],
-    ];
-```
+The `Criteriable` trait provides three Eloquent query scopes that translate an associative `$criteria` array — typically built from HTTP request parameters — into `WHERE`, `LIKE`, and `ORDER BY` clauses.
 
-Each array inside `$fulltextSearch` represent the fulltext indexes that will be used inside the `match` query.
+```php
+$criteria = $request->all(); // or $request->validated()
 
-You may search in a relationship that has a fulltext search index.
-
-```
-    protected ?array $fulltextSearch = [
-        'posts' => [
-            'content'
-        ]
-    ];
+Post::filterByCriteria($criteria)
+    ->searchByCriteria($criteria)
+    ->orderByCriteria($criteria)
+    ->paginate();
 ```
 
-Although when searching in a relationship you may only search at one index or composite index, this means the following wouldn't work
+### Filterable, Searchable, and Sortable columns
 
-```
-    protected ?array $fulltextSearch = [
-        'posts' => [
-            ['content'],
-            ['exerpt'],
-        ]
-    ];
-```
+By default all `$fillable` columns that are not in `$hidden` are filterable, searchable, and sortable. Override this for any or all three by declaring the corresponding property on your model:
 
-Both syntaxes may be combined to search locally and in relationships.
+```php
+class Post extends Model
+{
+    protected $fillable = ['title', 'body', 'status', 'published_at'];
+    protected $hidden   = ['body'];
 
-```
-    protected ?array $fulltextSearch = [
-        [
-            'firstname', 'lastname',
-        ],
-        // can't search in different indexes.
-        'parents' => [
-            'firstname', 'lastname',
-        ]
-    ];
+    // Only these columns can be filtered
+    protected ?array $filterables = ['status', 'published_at'];
+
+    // Only these columns are searched with LIKE
+    protected ?array $searchables = ['title'];
+
+    // Only these columns are accepted as sort keys
+    protected ?array $sortables = ['title', 'published_at'];
+}
 ```
 
-In simple and most common scenarios [MYSQL](https://dev.mysql.com/doc/refman/8.0/en/fulltext-natural-language.html) will provide an order based on the relevance of the results of full text search results, for more complex queries you will be required to
-### Relation filter/search
-To filter\search base on a relation you can define the relation name as the key and their columns as the value:
-```
-    protected ?array $filterables = [
-        'roles' => [
-            'id',
-            'name',
-        ]
-    ];
+---
 
+### scopeSearchByCriteria — `LIKE` search
+
+Looks for a `search` key in `$criteria` and applies `WHERE column LIKE '%value%'` across all searchable columns.
+
+**Criteria key:** `search`
+
+```php
+// GET /posts?search=laravel
+$criteria = ['search' => 'laravel'];
+
+Post::searchByCriteria($criteria)->get();
+// → WHERE (title LIKE '%laravel%')
 ```
+
+#### Searching in a relationship
+
+Add the relation name as the key and its columns as the value in `$searchables`:
+
+```php
+protected ?array $searchables = [
+    'title',
+    'author' => ['name', 'bio'], // searches inside the "author" relation
+];
+```
+
+```php
+$criteria = ['search' => 'john'];
+
+Post::searchByCriteria($criteria)->get();
+// → WHERE (title LIKE '%john%'
+//      OR EXISTS (SELECT * FROM authors WHERE posts.author_id = authors.id
+//                 AND (name LIKE '%john%' OR bio LIKE '%john%')))
+```
+
+#### Full-text search
+
+For MySQL/MariaDB full-text indexes declare `$fulltextSearch` on your model. Each entry in the array becomes a separate `MATCH … AGAINST` clause.
+
+```php
+// Local full-text index on (firstname, lastname)
+protected ?array $fulltextSearch = [
+    ['firstname', 'lastname'],
+];
+```
+
+```php
+$criteria = ['search' => 'Jane Doe'];
+
+User::searchByCriteria($criteria)->get();
+// → WHERE (MATCH(firstname, lastname) AGAINST('Jane Doe'))
+```
+
+Full-text search in a relationship:
+
+```php
+protected ?array $fulltextSearch = [
+    'posts' => ['title', 'body'],
+];
+```
+
+```php
+User::searchByCriteria(['search' => 'eloquent'])->get();
+// → WHERE EXISTS (SELECT * FROM posts WHERE …
+//        AND MATCH(title, body) AGAINST('eloquent'))
+```
+
+Both syntaxes can be combined:
+
+```php
+protected ?array $fulltextSearch = [
+    ['firstname', 'lastname'],      // local index
+    'posts' => ['title', 'body'],   // relation index
+];
+```
+
+> **Limitation:** A relation may only have one full-text index entry (a single flat array of columns). Multiple index arrays for the same relation are not supported.
+
+---
+
+### scopeFilterByCriteria — exact / operator filters
+
+Applies `WHERE column = value` for each filterable column found in `$criteria`.
+
+**Criteria keys:** the column names themselves (or nested under a `filter_key` — see [Filter Key](#filter-key)).
+
+#### Simple (equality) filter
+
+```php
+// GET /posts?status=published
+$criteria = ['status' => 'published'];
+
+Post::filterByCriteria($criteria)->get();
+// → WHERE status = 'published'
+```
+
+Multiple filters are combined with `AND`:
+
+```php
+$criteria = ['status' => 'published', 'published_at' => '2024-01-01'];
+
+Post::filterByCriteria($criteria)->get();
+// → WHERE status = 'published' AND published_at = '2024-01-01'
+```
+
+#### Operator filters
+
+Pass an associative array as the column's value to use a comparison operator. Supported operators:
+
+| Key | SQL operator |
+|-----|-------------|
+| `eq` | `=` |
+| `lt` | `<` |
+| `gt` | `>` |
+| `lte` | `<=` |
+| `gte` | `>=` |
+| `ne` | `!=` |
+
+```php
+// GET /posts?published_at[gte]=2024-01-01&published_at[lt]=2025-01-01
+$criteria = [
+    'published_at' => [
+        'gte' => '2024-01-01',
+        'lt'  => '2025-01-01',
+    ],
+];
+
+Post::filterByCriteria($criteria)->get();
+// → WHERE published_at >= '2024-01-01' AND published_at < '2025-01-01'
+```
+
+Multiple operators on the same column are all applied:
+
+```php
+$criteria = [
+    'views' => ['gte' => 100, 'lte' => 500],
+];
+
+Post::filterByCriteria($criteria)->get();
+// → WHERE views >= 100 AND views <= 500
+```
+
+#### Relation filter
+
+Add the relation name as the key and its filterable columns as the value in `$filterables`. The criteria array must then nest the filter values under the relation name:
+
+```php
+protected ?array $filterables = [
+    'tags' => ['name', 'slug'],
+];
+```
+
+```php
+// GET /posts?tags[name]=php
+$criteria = [
+    'tags' => ['name' => 'php'],
+];
+
+Post::filterByCriteria($criteria)->get();
+// → WHERE EXISTS (SELECT * FROM tags WHERE … AND name = 'php')
+```
+
+#### Filter Key
+
+By default, every key in `$criteria` is treated as a potential filter. If you want filters to live under a dedicated namespace (e.g. to keep them separate from pagination and search parameters), set `filter_key` in `config/repository.php`:
+
+```php
+// config/repository.php
+'filter_key' => 'filters',
+```
+
+```php
+// GET /posts?filters[status]=published&page=2
+$criteria = [
+    'filters' => ['status' => 'published'],
+    'page'    => 2,          // ignored by filterByCriteria
+    'search'  => 'laravel',  // used by searchByCriteria
+];
+
+Post::filterByCriteria($criteria)->get();
+// → WHERE status = 'published'
+```
+
+---
+
+### scopeOrderByCriteria — sorting
+
+Looks for `order` (column) and `direction` (`asc` / `desc`, defaults to `desc`) keys in `$criteria`. The column must be in the model's sortable list or it is silently ignored.
+
+**Criteria keys:** `order`, `direction`
+
+```php
+// GET /posts?order=published_at&direction=asc
+$criteria = ['order' => 'published_at', 'direction' => 'asc'];
+
+Post::orderByCriteria($criteria)->get();
+// → ORDER BY published_at ASC
+```
+
+```php
+// Direction defaults to desc when omitted
+Post::orderByCriteria(['order' => 'title'])->get();
+// → ORDER BY title DESC
+```
+
+---
+
+### Combining all three scopes
+
+```php
+$criteria = $request->all();
+// e.g. ?search=laravel&status=published&views[gte]=100&order=published_at&direction=asc
+
+Post::searchByCriteria($criteria)
+    ->filterByCriteria($criteria)
+    ->orderByCriteria($criteria)
+    ->paginate(15);
+```
+
+---
 
 ### Runtime manipulation
-You can define what filterable/searchable/sortable at run time by calling these functions:
 
-```
-Model::setSearchables(['name'])
-Model::setFilterables(['name']);
-Model::setSortables(['name']);
+Override or extend filterable / searchable / sortable columns at runtime without changing the model definition:
+
+```php
+// Replace the list entirely
+Post::setSearchables(['title', 'excerpt'])->searchByCriteria($criteria)->get();
+Post::setFilterables(['status'])->filterByCriteria($criteria)->get();
+Post::setSortables(['title', 'created_at'])->orderByCriteria($criteria)->get();
+
+// Append to the existing list
+Post::appendSearchables(['summary'])->searchByCriteria($criteria)->get();
+Post::appendFilterables(['category_id'])->filterByCriteria($criteria)->get();
+Post::appendSortables(['views'])->orderByCriteria($criteria)->get();
 ```
 
-Or append to the array that already defined in the model:
-```
-Model::appendSearchables(['name'])
-Model::appendFilterables(['name']);
-Model::appendSortables(['name']);
+These scopes are chainable with any other builder call:
+
+```php
+Post::setFilterables(['status', 'category_id'])
+    ->filterByCriteria($criteria)
+    ->where('user_id', auth()->id())
+    ->latest()
+    ->get();
 ```

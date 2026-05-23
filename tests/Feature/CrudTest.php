@@ -13,8 +13,10 @@ class CrudTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        config(['repository.disable_cache' => true]);
+        config(['repository.stubs_path' => __DIR__.'/../stubs']);
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");
-        $this->createDatabase();
+        $this->createTable();
     }
 
     public function tearDown(): void
@@ -27,11 +29,165 @@ class CrudTest extends TestCase
     {
         Route::get('tests', [TestController::class, 'index']);
 
+        $this->generateModels(count: 5);
+
         $response = $this->getJson('tests');
 
         $this->assertContains($response->getStatusCode(), [
             Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
         ]);
+
+        $response->assertjsonCount(5, 'data');
+    }
+
+    public function testSearch()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type1'], count: 5);
+        Test::query()->create(['name' => 'mytest', 'type' => 'Type1']);
+
+        $response = $this->getJson('tests?search=mytest');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertjsonCount(1, 'data');
+    }
+
+    public function testFilter()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?type=Type1');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testFilterWithEqualOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?type[eq]=Type1');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testFilterWithGreaterOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->travel(2)->months();
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?created_at[gt]='.now()->subMonth()->format('Y-m-d'));
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testFilterWithLessThanOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+        $this->travel(2)->months();
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+
+        $response = $this->getJson('tests?created_at[lt]='.now()->subMonth()->format('Y-m-d'));
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testFilterWithLessThanOrEqualOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+        $this->travel(2)->months();
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+
+        $response = $this->getJson('tests?created_at[lte]='.now()->subMonth()->format('Y-m-d'));
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testFilterWithGreaterThanOrEqualOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->travel(2)->months();
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?created_at[gte]='.now()->subMonth()->format('Y-m-d'));
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testFilterWithNotEqualOperator()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?type[ne]=Type2');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testSort()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'Bravo', 'type' => 'Type1']);
+        $this->generateModels(['name' => 'Alpha', 'type' => 'Type1']);
+        $this->generateModels(['name' => 'Charlie', 'type' => 'Type1']);
+
+        $response = $this->getJson('tests?order=name&direction=asc');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $names = collect($response->json('data'))->pluck('name')->values()->all();
+        $this->assertEquals(['Alpha', 'Bravo', 'Charlie'], $names);
     }
 
     public function testCreate()

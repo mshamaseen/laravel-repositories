@@ -2,9 +2,10 @@ name: QA
 
 on:
     push:
-        branches: [ "main", "development" ]
+        branches: [ "main", "development", '4.x' ]
     pull_request:
-        branches: [ "main", "development" ]
+        branches: [ "main", "development", '4.x' ]
+    workflow_dispatch:
 
 jobs:
     laravel-tests:
@@ -14,14 +15,8 @@ jobs:
             fail-fast: false
             matrix:
                 include:
-                    -   laravel: "^11.0"
-                        testbench: "^9.0"
-
-                    -   laravel: "^12.0"
-                        testbench: "^10.0"
-
-#                    -   laravel: "^13.0"
-#                        testbench: "^11.0"
+                    -   laravel: "^13.0"
+                        testbench: "^11.0"
 
         steps:
             -   uses: actions/checkout@v3

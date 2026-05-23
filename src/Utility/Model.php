@@ -2,7 +2,7 @@
 
 namespace Shamaseen\Repository\Utility;
 
-use Eloquent;
+use \Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Shamaseen\Repository\Interfaces\CriteriableModelInterface;
 use Shamaseen\Repository\Utility\Models\CachePerRequest;
@@ -18,7 +18,7 @@ use Shamaseen\Repository\Utility\Models\Criteriable;
  * @method static Builder newQuery()
  * @method static Builder query()
  *
- * @mixin Eloquent
+ * @mixin \Illuminate\Database\Eloquent\Model
  */
 class Model extends Eloquent implements CriteriableModelInterface
 {

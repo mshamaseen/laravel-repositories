@@ -3,6 +3,7 @@
 namespace Shamaseen\Repository\Utility\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
  * @method static Builder filterByCriteria(array $criteria)
@@ -17,6 +18,16 @@ use Illuminate\Database\Eloquent\Builder;
  */
 trait Criteriable
 {
+    protected array $allowedFilterOperators = [
+        'eq' => '=',
+        'lt' => '<',
+        'gt' => '>',
+        'lte' => '<=',
+        'gte' => '>=',
+        'ne' => '!=',
+//        for future support
+//        'like', 'not like', 'in', 'not in', 'between', 'not between'
+    ];
     protected ?array $searchables = null;
     protected ?array $filterables = null;
     protected ?array $sortables = null;
@@ -44,35 +55,55 @@ trait Criteriable
         return $criteria;
     }
 
-    public function scopeFilterByCriteria($query, array $criteria): Builder
+    public function scopeFilterByCriteria(Builder $query, array $criteria): Builder
     {
         $requestFilters = $this->getFiltersFromCriteria($criteria);
-
         foreach ($this->getFilterables() as $method => $columns) {
-            // if this is associative then it is a relation
+            // if the model filterable member is an associative array then it is a relation
             if ('string' === gettype($method)) {
-                if (method_exists($this, $method) && array_key_exists($method, $requestFilters)) {
-                    $query->whereHas($method, function ($query) use ($requestFilters, $columns, $method) {
-                        /* @var $query Builder */
-                        $query->where(function ($query2) use ($requestFilters, $columns, $method) {
-                            /* @var $query2 Builder */
-                            foreach ((array) $columns as $column) {
-                                if (isset($requestFilters[$method][$column])) {
-                                    $query2->where($column, $requestFilters[$method][$column]);
-                                }
-                            }
-                        });
-                    });
-                }
+                $this->filterByRelation($query, $method, $columns, $requestFilters);
             } elseif (array_key_exists($columns, $requestFilters)) {
-                $query->where($columns, $requestFilters[$columns]);
+                $requestField = $requestFilters[$columns];
+                if(is_string($requestField)) {
+                    $query->where($columns, $requestFilters[$columns]);
+                } elseif(is_array($requestField)) {
+                    $this->tryToFilterByOperator($query, $columns, $requestField);
+                }
             }
         }
 
         return $query;
     }
 
-    public function scopeSearchByCriteria($query, array $criteria): Builder
+    protected function tryToFilterByOperator(Builder $query, string $column, array $requestField): Builder
+    {
+        foreach ($requestField as $operator => $value) {
+            if (array_key_exists($operator, $this->allowedFilterOperators)) {
+                $query->where($column, $this->allowedFilterOperators[$operator], $value);
+            }
+        }
+
+        return $query;
+    }
+
+    protected function filterByRelation(Builder $query, string $method, array $columns, array $requestFilters): Builder
+    {
+        if (method_exists($this, $method) && array_key_exists($method, $requestFilters)) {
+            $query->whereHas($method, function ($query) use ($requestFilters, $columns, $method) {
+                $query->where(function ($query2) use ($requestFilters, $columns, $method) {
+                    /* @var $query2 Builder */
+                    foreach ($columns as $column) {
+                        if (isset($requestFilters[$method][$column])) {
+                            $query2->where($column, $requestFilters[$method][$column]);
+                        }
+                    }
+                });
+            });
+        }
+
+        return $query;
+    }
+    public function scopeSearchByCriteria(Builder $query, array $criteria): Builder
     {
         if (!isset($criteria['search'])) {
             return $query;
@@ -122,7 +153,7 @@ trait Criteriable
         $query->orWhere($column, 'like', '%'.$search.'%');
     }
 
-    public function scopeOrderByCriteria($query, array $criteria): Builder
+    public function scopeOrderByCriteria(Builder $query, array $criteria): Builder
     {
         if (isset($criteria['order']) && in_array($criteria['order'], $this->getSortables())) {
             $query->orderBy($criteria['order'], $criteria['direction'] ?? 'desc');

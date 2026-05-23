@@ -1,0 +1,40 @@
+<?php
+
+namespace {{namespace}};
+
+use {{parentClass}} as Controller;
+use {{RequestsNamespace}}\{{modelName}}Request;
+use {{ResourcesNamespace}}\{{modelName}}Collection;
+use {{ResourcesNamespace}}\{{modelName}}Resource;
+use {{PoliciesNamespace}}\{{modelName}}Policy;
+use {{RepositoriesNamespace}}\{{modelName}}Repository;
+
+/**
+ * Class {{modelName}}Controller.
+ *
+ * @property {{modelName}}Repository $repository
+ */
+class {{modelName}}Controller extends Controller
+{
+
+    public string $routeIndex = '{{lcPluralModelName}}.index';
+
+    public string $pageTitle = '{{modelName}}';
+    public string $createRoute = '{{lcPluralModelName}}.create';
+
+    public string $viewIndex = '{{lcPluralModelName}}.index';
+    public string $viewCreate = '{{lcPluralModelName}}.create';
+    public string $viewEdit = '{{lcPluralModelName}}.edit';
+    public string $viewShow = '{{lcPluralModelName}}.show';
+    {{ResourcesProperties}} {{PolicyProperty}} {{RequestProperty}}
+
+    /**
+     * {{modelName}}Controller constructor.
+     *
+     * @param {{modelName}}Repository $repository
+     */
+    public function __construct({{modelName}}Repository $repository)
+    {
+        parent::__construct($repository);
+    }
+}

@@ -64,14 +64,18 @@ class ConnectionProxy implements ConnectionInterface
     }
 
     /**
+     * @param string $query
+     * @param array $bindings
+     * @param true $useReadPdo
+     * @param array $fetchUsing
      * @throws InvalidArgumentException
      */
-    public function select($query, $bindings = [], $useReadPdo = true)
+    public function select($query, $bindings = [], $useReadPdo = true, array $fetchUsing = [])
     {
         $fullQuery = Str::replaceArray('?', $bindings, $query);
 
-        return $this->cacheOrNext($fullQuery, function () use ($query, $bindings, $useReadPdo) {
-            return $this->realConnection->select($query, $bindings, $useReadPdo);
+        return $this->cacheOrNext($fullQuery, function () use ($query, $bindings, $useReadPdo, $fetchUsing) {
+            return $this->realConnection->select($query, $bindings, $useReadPdo, $fetchUsing);
         });
     }
 
@@ -85,9 +89,9 @@ class ConnectionProxy implements ConnectionInterface
         return $this->realConnection->raw($value);
     }
 
-    public function cursor($query, $bindings = [], $useReadPdo = true)
+    public function cursor($query, $bindings = [], $useReadPdo = true, array $fetchUsing = [])
     {
-        return $this->realConnection->cursor($query, $bindings, $useReadPdo);
+        return $this->realConnection->cursor($query, $bindings, $useReadPdo, $fetchUsing);
     }
 
     public function insert($query, $bindings = [])

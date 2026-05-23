@@ -81,7 +81,14 @@ abstract class AbstractRepository implements RepositoryInterface
     /** @return TModel|int|bool */
     public function update(int|string $id, array $data = []): int|bool|EloquentModel
     {
-        return $this->getNewBuilderWithScope()->where($this->model->getKeyName(), $id)->update($data);
+        $model = $this->getNewBuilderWithScope()->find($id);
+        if(!$model) {
+            return false;
+        }
+        $model->fill($data);
+        $model->save();
+
+        return $model;
     }
 
     public function delete(int|string $id = 0): int|bool

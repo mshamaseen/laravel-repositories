@@ -1,0 +1,23 @@
+<?php
+namespace {{namespace}};
+
+use {{parentClass}} as AbstractRepository;
+use {{ModelNamespace}}\{{modelName}};
+
+/**
+ * Class {{modelName}}Repository.
+ *
+ * @extends AbstractRepository<{{modelName}}>
+ */
+class {{modelName}}Repository extends AbstractRepository
+{
+    public array $with = [];
+
+    /**
+     * @return string
+     */
+    public function getModelClass(): string
+    {
+        return {{modelName}}::class;
+    }
+}
