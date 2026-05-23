@@ -1,5 +1,4 @@
 # Laravel-Repositories
-[![Build Status](https://scrutinizer-ci.com/g/mshamaseen/laravel-repositories/badges/build.png?b=main)](https://scrutinizer-ci.com/g/mshamaseen/laravel-repositories/build-status/main) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mshamaseen/laravel-repositories/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/mshamaseen/laravel-repositories/?branch=main) [![Code Intelligence Status](https://scrutinizer-ci.com/g/mshamaseen/laravel-repositories/badges/code-intelligence.svg?b=main)](https://scrutinizer-ci.com/code-intelligence)
 
 A Laravel Repository generator with the best practice and tools already set and ready to be used.
 

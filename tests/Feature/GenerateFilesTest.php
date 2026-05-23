@@ -12,14 +12,6 @@ class GenerateFilesTest extends TestCase
 {
     private array $filesToGenerate = ['Controller', 'Repository', 'Model', 'Request', 'Resource', 'Collection', 'Policy', 'Test'];
 
-    /**
-     * @param string $dataName
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     public function testGenerate()
     {
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");

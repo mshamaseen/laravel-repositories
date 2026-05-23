@@ -1,40 +1,46 @@
 name: QA
 
 on:
-  push:
-    branches: [ "main" , "development"]
-  pull_request:
-    branches: [ "main" , "development"]
+    push:
+        branches: [ "main", "development" ]
+    pull_request:
+        branches: [ "main", "development" ]
 
 jobs:
-  laravel-tests:
-    runs-on: ubuntu-latest
+    laravel-tests:
+        runs-on: ubuntu-latest
 
-#    services:
-#      mysql:
-#        image: mysql
-#        env:
-#          MYSQL_DATABASE: testing
-#          MYSQL_USER: testing
-#          MYSQL_PASSWORD: password
-#          MYSQL_ROOT_PASSWORD: password
-#        ports:
-#          - 3306:3306
-#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    -   laravel: "^11.0"
+                        testbench: "^9.0"
 
-    steps:
-      - name: 'PHP Check'
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Install Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress
-#      - name: PHP Cs Fixer
-#        run: vendor/bin/php-cs-fixer fix --dry-run
-#      - name: Larastan
-#        run: vendor/bin/phpstan analyze
-      - name: Execute tests (Unit and Feature tests) via PHPUnit
-        run: vendor/bin/phpunit
+                    -   laravel: "^12.0"
+                        testbench: "^10.0"
+
+#                    -   laravel: "^13.0"
+#                        testbench: "^11.0"
+
+        steps:
+            -   uses: actions/checkout@v3
+                with:
+                    submodules: true
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: "8.3"
+
+            -   name: Install dependencies
+                run: |
+                    composer require \
+                      "laravel/framework:${{ matrix.laravel }}" \
+                      "orchestra/testbench:${{ matrix.testbench }}" \
+                      --no-interaction --no-update
+                    
+                    composer update --prefer-dist --no-interaction
+
+            -   name: Run tests
+                run: vendor/bin/phpunit
