@@ -12,14 +12,6 @@ class UngenerateFilesTest extends TestCase
     protected string $modelName = 'Test';
     protected string $userPath = 'Tests';
 
-    /**
-     * @param string $dataName
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     public function testUngenerate()
     {
         $this->artisan("ungenerate:repository $this->userPath/$this->modelName")
