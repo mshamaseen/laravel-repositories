@@ -15,4 +15,8 @@ class {{modelName}} extends Model
     protected $guarded = [];
 
     protected ?array $searchables = ['name'];
+
+    protected ?array $filterables = ['type'];
+    protected ?array $sortables = ['name'];
+
 }

@@ -55,6 +55,40 @@ class CrudTest extends TestCase
         $response->assertjsonCount(1, 'data');
     }
 
+    public function testFilter()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'no', 'type' => 'Type2'], count: 3);
+        $this->generateModels(['name' => 'yes', 'type' => 'Type1'], count: 2);
+
+        $response = $this->getJson('tests?type=Type1');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $response->assertJsonCount(2, 'data');
+    }
+
+    public function testSort()
+    {
+        Route::get('tests', [TestController::class, 'index']);
+
+        $this->generateModels(['name' => 'Bravo', 'type' => 'Type1']);
+        $this->generateModels(['name' => 'Alpha', 'type' => 'Type1']);
+        $this->generateModels(['name' => 'Charlie', 'type' => 'Type1']);
+
+        $response = $this->getJson('tests?order=name&direction=asc');
+
+        $this->assertContains($response->getStatusCode(), [
+            Response::HTTP_OK, Response::HTTP_PARTIAL_CONTENT,
+        ]);
+
+        $names = collect($response->json('data'))->pluck('name')->values()->all();
+        $this->assertEquals(['Alpha', 'Bravo', 'Charlie'], $names);
+    }
+
     public function testCreate()
     {
         Route::get('tests/create', [TestController::class, 'create']);
