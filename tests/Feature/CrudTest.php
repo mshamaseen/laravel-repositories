@@ -13,6 +13,7 @@ class CrudTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        config(['repository.disable_cache' => true]);
         config(['repository.stubs_path' => __DIR__.'/../stubs']);
         $this->artisan("generate:repository $this->userPath/$this->modelName -f");
         $this->createTable();
