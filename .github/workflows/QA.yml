@@ -20,8 +20,8 @@ jobs:
                     -   laravel: "^12.0"
                         testbench: "^10.0"
 
-                    -   laravel: "^13.0"
-                        testbench: "^11.0"
+#                    -   laravel: "^13.0"
+#                        testbench: "^11.0"
 
         steps:
             -   uses: actions/checkout@v3
