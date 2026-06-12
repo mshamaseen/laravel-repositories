@@ -64,10 +64,10 @@ trait Criteriable
                 $this->filterByRelation($query, $method, $columns, $requestFilters);
             } elseif (array_key_exists($columns, $requestFilters)) {
                 $requestField = $requestFilters[$columns];
-                if(is_string($requestField)) {
-                    $query->where($columns, $requestFilters[$columns]);
-                } elseif(is_array($requestField)) {
+                if(is_array($requestField)) {
                     $this->tryToFilterByOperator($query, $columns, $requestField);
+                } else {
+                    $query->where($columns, $requestFilters[$columns]);
                 }
             }
         }
