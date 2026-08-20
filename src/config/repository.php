@@ -3,8 +3,11 @@
 // we are not using realpath function here because it will not allow the tests to run.
 
 return [
-    // global cache disable, if you use this option all the caches will be disabled
-    // can't be overriden by the scopes.
+    // Global cache disable. If you use this option all the caches will be disabled,
+    // and it can't be overridden by the scopes.
+    // Note: turning this on in your test suite means the caching layer is never
+    // exercised by your tests while staying fully active in production.
+    // See docs/Base/Model.md#cacheperrequest for the invalidation contract.
     'disable_cache' => false,
     // we need this to publish language files
     'lang_path' => '../resources/lang',

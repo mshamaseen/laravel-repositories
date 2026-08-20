@@ -15,20 +15,52 @@ class Post extends Model
 
 ## CachePerRequest
 
-The `CachePerRequest` trait caches SELECT query results for the lifetime of the current HTTP request using Laravel's built-in `array` cache driver. Identical queries (same SQL + bindings) executed more than once within the same request are served from memory instead of hitting the database again.
+The `CachePerRequest` trait caches SELECT query results for the lifetime of the current request using Laravel's built-in `array` cache driver. Identical queries (same SQL + bindings) executed more than once within the same request are served from memory instead of hitting the database again.
+
+It is enabled by default on every model extending `Shamaseen\Repository\Utility\Model`.
 
 ### How it works
 
-The trait replaces the model's database connection with a thin `ConnectionProxy`. Every `select` / `selectOne` call builds a cache key from the fully-resolved SQL string. On a cache hit the result is returned immediately; on a miss the real query runs and the result is stored before being returned.
+The trait replaces the model's database connection with a thin `ConnectionProxy`. Every `select` / `selectOne` / `scalar` call builds a cache key from the fully-resolved SQL string. On a cache hit the result is returned immediately; on a miss the real query runs and the result is stored before being returned.
+
+### What invalidates the cache
+
+**Every write through the model's connection clears the entire cache.** `insert`, `update`, `delete`, `statement`, `affectingStatement` and `unprepared` all flush it once the write completes, so a read after a write always reflects the new state:
+
+```php
+$account = Account::find(1);                    // reads 2500, cached
+Account::where('id', 1)->update(['balance' => 999]);  // cache flushed
+$account = Account::find(1);                    // reads 999 from the database
+```
+
+Invalidation is deliberately coarse. Entries are keyed by SQL string, so there is no reliable way to know which cached reads a given write affected — dropping all of them is the only conservative option. In a read-heavy request (a policy, a controller and a resource all fetching the same row) the cache still does its job; in a write-heavy one it effectively turns itself off.
+
+### What is never cached
+
+Some reads are always sent to the database, regardless of the flags below:
+
+| Query | Why |
+|---|---|
+| Locking reads — `lockForUpdate()`, `sharedLock()`, or any SQL containing `FOR UPDATE`, `FOR SHARE`, `LOCK IN SHARE MODE`, or SQL Server's `UPDLOCK` / `HOLDLOCK` / `ROWLOCK` hints | A locking read served from cache never reaches the database, so the row lock would never be taken |
+| Any read while `DB::transactionLevel() > 0` | A value cached inside a transaction would survive a rollback, leaving the cache asserting a state that was never committed |
+| `cursor()` | Streams straight from the connection by design |
+
+### Known limitations
+
+- **Writes that bypass the model are invisible to the cache.** A raw `DB::table('accounts')->update(...)`, a raw PDO statement, or a database trigger does not go through the proxy and therefore does not invalidate anything. Route writes through the model, or call `clearCache()` yourself.
+- **Another process writing the same row cannot invalidate your cache.** The cache is per-process and lives for the request; it makes no cross-process guarantees.
+- **Overriding `getRequestCacheKey()` splits the cache into separate buckets.** A write made through one model then only flushes that model's bucket. Only override it if you understand that consequence.
 
 ### Disabling cache globally
 
-Set `disable_cache` to `true` in `config/repository.php` to turn off caching for every model. This flag cannot be overridden at runtime and is useful for testing environments.
+Set `disable_cache` to `true` in `config/repository.php` to turn off caching for every model. This flag cannot be overridden at runtime.
 
 ```php
 // config/repository.php
 'disable_cache' => true,
 ```
+
+> **Note:** if you disable the cache in your test suite, none of the caching behaviour above is exercised by your tests while it stays fully active in production. Consider leaving it on and disabling it only for the tests that need determinism.
 
 ### Disabling cache per model
 
@@ -47,9 +79,9 @@ Three chainable query scopes let you control caching on a per-query basis:
 
 | Scope | Effect |
 |---|---|
-| `disableCache()` | Turns off caching for subsequent queries on this builder |
+| `disableCache()` | Turns off caching for subsequent queries on this model instance |
 | `enableCache()` | Turns caching back on |
-| `clearCache()` | Wipes the in-memory cache store for this model |
+| `clearCache()` | Wipes the in-memory cache bucket for this model |
 
 ```php
 // Run a query without using or storing the cache
@@ -61,6 +93,8 @@ $posts = Post::clearCache()->where('status', 'published')->get();
 // Chain with any other builder methods
 Post::disableCache()->where('user_id', $userId)->orderBy('created_at')->get();
 ```
+
+> **Note:** `disableCache()` only bypasses the cache — it neither evicts the existing entry nor stores the fresh result. Use `clearCache()` when you want the stale entry gone.
 
 > **Note:** `refresh()` on a model instance automatically bypasses the cache so the reloaded attributes always reflect the current database state.
 

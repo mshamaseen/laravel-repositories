@@ -22,6 +22,7 @@
             <file>./tests/Feature/GenerateFilesTest.php</file>
             <file>./tests/Feature/CrudTest.php</file>
             <file>./tests/Feature/UngenerateFilesTest.php</file>
+            <file>./tests/Feature/CachePerRequestTest.php</file>
         </testsuite>
     </testsuites>
     <php>
