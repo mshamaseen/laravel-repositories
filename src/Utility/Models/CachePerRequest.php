@@ -3,7 +3,6 @@
 namespace Shamaseen\Repository\Utility\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * @method Builder disableCache()
@@ -35,9 +34,6 @@ trait CachePerRequest
         return $query;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function scopeClearCache(Builder $query): Builder
     {
         $this->requestCache->clear();

@@ -8,7 +8,6 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
-use Psr\SimpleCache\InvalidArgumentException;
 use Shamaseen\Repository\Utility\Model;
 
 class ConnectionProxy implements ConnectionInterface
@@ -73,9 +72,6 @@ class ConnectionProxy implements ConnectionInterface
         return false;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function cacheOrNext($fullQuery, callable $next, ?string $rawQuery = null)
     {
         if (!$this->shouldCache($rawQuery ?? $fullQuery)) {
@@ -108,8 +104,6 @@ class ConnectionProxy implements ConnectionInterface
      * touched; clearing all of them is the only conservative choice. Writes that
      * bypass this proxy (raw `DB::table()` calls, for instance) cannot invalidate
      * anything -- see the caveats in docs/Base/Model.md.
-     *
-     * @throws InvalidArgumentException
      */
     private function writeAndInvalidate(callable $write)
     {
@@ -124,9 +118,6 @@ class ConnectionProxy implements ConnectionInterface
 
     // Laravel methods >>>
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function selectOne($query, $bindings = [], $useReadPdo = true)
     {
         $fullQuery = Str::replaceArray('?', $bindings, $query);
@@ -141,7 +132,6 @@ class ConnectionProxy implements ConnectionInterface
      * @param array $bindings
      * @param true $useReadPdo
      * @param array $fetchUsing
-     * @throws InvalidArgumentException
      */
     public function select($query, $bindings = [], $useReadPdo = true, array $fetchUsing = [])
     {
@@ -167,9 +157,6 @@ class ConnectionProxy implements ConnectionInterface
         return $this->realConnection->cursor($query, $bindings, $useReadPdo, $fetchUsing);
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function insert($query, $bindings = [])
     {
         return $this->writeAndInvalidate(function () use ($query, $bindings) {
@@ -177,9 +164,6 @@ class ConnectionProxy implements ConnectionInterface
         });
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function update($query, $bindings = [])
     {
         return $this->writeAndInvalidate(function () use ($query, $bindings) {
@@ -187,9 +171,6 @@ class ConnectionProxy implements ConnectionInterface
         });
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function delete($query, $bindings = [])
     {
         return $this->writeAndInvalidate(function () use ($query, $bindings) {
@@ -197,9 +178,6 @@ class ConnectionProxy implements ConnectionInterface
         });
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function statement($query, $bindings = [])
     {
         return $this->writeAndInvalidate(function () use ($query, $bindings) {
@@ -207,9 +185,6 @@ class ConnectionProxy implements ConnectionInterface
         });
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function affectingStatement($query, $bindings = [])
     {
         return $this->writeAndInvalidate(function () use ($query, $bindings) {
@@ -217,9 +192,6 @@ class ConnectionProxy implements ConnectionInterface
         });
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function unprepared($query)
     {
         return $this->writeAndInvalidate(function () use ($query) {
@@ -297,9 +269,6 @@ class ConnectionProxy implements ConnectionInterface
         );
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function scalar($query, $bindings = [], $useReadPdo = true)
     {
         $fullQuery = Str::replaceArray('?', $bindings, $query);

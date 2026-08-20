@@ -15,13 +15,29 @@ class Post extends Model
 
 ## CachePerRequest
 
-The `CachePerRequest` trait caches SELECT query results for the lifetime of the current request using Laravel's built-in `array` cache driver. Identical queries (same SQL + bindings) executed more than once within the same request are served from memory instead of hitting the database again.
+The `CachePerRequest` trait caches SELECT query results for the lifetime of the current request. Identical queries (same SQL + bindings) executed more than once within the same request are served from memory instead of hitting the database again.
 
 It is enabled by default on every model extending `Shamaseen\Repository\Utility\Model`.
 
 ### How it works
 
 The trait replaces the model's database connection with a thin `ConnectionProxy`. Every `select` / `selectOne` / `scalar` call builds a cache key from the fully-resolved SQL string. On a cache hit the result is returned immediately; on a miss the real query runs and the result is stored before being returned.
+
+### How long "per request" lasts
+
+Entries live in `RequestCacheStore`, which the package registers as a **scoped** container binding. Laravel forgets scoped instances at exactly the boundaries this cache means by "request", so the cache empties itself in every context without any action on your part:
+
+| Context | Cache lifetime |
+|---|---|
+| HTTP request | The request |
+| `queue:work` (daemon) | One job — the worker's between-jobs reset drops the store |
+| `queue:listen` | One job — each job is a fresh process anyway |
+| Octane | One request or task — Octane flushes scoped instances on `OperationTerminated` |
+| `schedule:run` / long-running artisan commands / `tinker` | The process, since nothing marks a boundary inside one |
+
+> **Before 4.3.0** entries were kept in `Cache::store('array')`. That store hangs off the `CacheManager` **singleton**, which nothing ever resets, so under `queue:work` cached rows survived from one job to the next for the life of the worker process — unbounded staleness plus a cache that only grew. If you relied on reading the package's entries out of `Cache::store('array')` directly, resolve `Shamaseen\Repository\Utility\Models\RequestCacheStore` from the container instead.
+
+Note the last row: a `schedule:run`, an `artisan` command that runs for hours, or a `tinker` session is one long "request" as far as this cache is concerned. Call `clearCache()` at a natural boundary in those, or disable the cache for that model.
 
 ### What invalidates the cache
 
@@ -48,7 +64,7 @@ Some reads are always sent to the database, regardless of the flags below:
 ### Known limitations
 
 - **Writes that bypass the model are invisible to the cache.** A raw `DB::table('accounts')->update(...)`, a raw PDO statement, or a database trigger does not go through the proxy and therefore does not invalidate anything. Route writes through the model, or call `clearCache()` yourself.
-- **Another process writing the same row cannot invalidate your cache.** The cache is per-process and lives for the request; it makes no cross-process guarantees.
+- **Another process writing the same row cannot invalidate your cache.** The cache is per-process and lives for one request or one queue job; it makes no cross-process guarantees. A row read early in a job can be stale by the end of that job if another worker updated it.
 - **Overriding `getRequestCacheKey()` splits the cache into separate buckets.** A write made through one model then only flushes that model's bucket. Only override it if you understand that consequence.
 
 ### Disabling cache globally

@@ -23,6 +23,7 @@
             <file>./tests/Feature/CrudTest.php</file>
             <file>./tests/Feature/UngenerateFilesTest.php</file>
             <file>./tests/Feature/CachePerRequestTest.php</file>
+            <file>./tests/Feature/CacheLifetimeTest.php</file>
         </testsuite>
     </testsuites>
     <php>

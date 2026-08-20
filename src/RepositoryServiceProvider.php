@@ -5,6 +5,7 @@ namespace Shamaseen\Repository;
 use Illuminate\Support\ServiceProvider;
 use Shamaseen\Repository\Commands\Generator;
 use Shamaseen\Repository\Commands\Remover;
+use Shamaseen\Repository\Utility\Models\RequestCacheStore;
 
 /**
  * Class GeneratorServiceProvider.
@@ -52,5 +53,9 @@ class RepositoryServiceProvider extends ServiceProvider
             __DIR__.'/config/repository.php',
             'repository'
         );
+
+        // Registered here so the binding exists from boot; the lifetime itself is
+        // declared once, inside RequestCacheStore.
+        RequestCacheStore::register($this->app);
     }
 }

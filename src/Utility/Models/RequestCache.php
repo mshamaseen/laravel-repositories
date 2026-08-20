@@ -2,10 +2,14 @@
 
 namespace Shamaseen\Repository\Utility\Models;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
-use Psr\SimpleCache\InvalidArgumentException;
-
+/**
+ * A named bucket inside the per-request cache.
+ *
+ * Deliberately holds nothing but its key: the entries live in the scoped
+ * `RequestCacheStore` and are resolved on every call. A model instance that
+ * outlives a request (or a job) therefore cannot drag a stale bucket along with
+ * it -- it simply reads whatever store the current scope owns.
+ */
 class RequestCache
 {
     public string $key;
@@ -15,57 +19,43 @@ class RequestCache
         $this->key = $key;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function getRepositoryCacheCollection(): Collection
+    private function store(): RequestCacheStore
     {
-        return Cache::store('array')->get($this->key, collect([]));
+        return RequestCacheStore::resolve();
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function get($key, $default = null)
     {
-        return $this->getRepositoryCacheCollection()->get($key, $default);
+        return $this->store()->get($this->key, $key, $default);
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function set($key, $value): bool
     {
-        return Cache::store('array')->set(
-            $this->key,
-            $this->getRepositoryCacheCollection()->put($key, $value)
-        );
+        $this->store()->put($this->key, $key, $value);
+
+        return true;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     public function delete(array|string|int $key): bool
     {
-        return Cache::store('array')->set(
-            $this->key,
-            $this->getRepositoryCacheCollection()->forget($key)
-        );
+        $this->store()->forget($this->key, $key);
+
+        return true;
     }
 
     /**
-     * @throws InvalidArgumentException
+     * Empty this bucket. Other buckets -- models that override
+     * `getRequestCacheKey()` -- are left alone.
      */
     public function clear(): bool
     {
-        return Cache::store('array')->set(
-            $this->key,
-            collect([])
-        );
+        $this->store()->flushBucket($this->key);
+
+        return true;
     }
 
     public function all(): array
     {
-        return $this->getRepositoryCacheCollection()->all();
+        return $this->store()->bucket($this->key);
     }
 }
