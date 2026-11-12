@@ -72,6 +72,28 @@ class ConnectionProxy implements ConnectionInterface
         return false;
     }
 
+    /**
+     * Identifies the database a query runs against, so two databases reached through the same connection
+     * name (multi-database tenancy repoints one connection per tenant) never share cached results.
+     *
+     * Built on every cached read, so it sticks to cheap config lookups -- never a hash of the whole config,
+     * which also holds credentials. The table prefix is left out because the grammar already writes it
+     * into the SQL.
+     */
+    private function cacheKey(string $fullQuery): string
+    {
+        $connection = $this->realConnection;
+
+        return implode("\0", [
+            $connection->getName(),
+            json_encode($connection->getConfig('host')),   // may be an array (read/write split)
+            (string) $connection->getConfig('port'),
+            (string) $connection->getDatabaseName(),        // reflects setDatabaseName(), unlike config
+            json_encode($connection->getConfig('search_path') ?? $connection->getConfig('schema')), // pgsql schema-per-tenant
+            $fullQuery,
+        ]);
+    }
+
     public function cacheOrNext($fullQuery, callable $next, ?string $rawQuery = null)
     {
         if (!$this->shouldCache($rawQuery ?? $fullQuery)) {
@@ -79,11 +101,12 @@ class ConnectionProxy implements ConnectionInterface
         }
 
         $cache = $this->model->requestCache;
+        $key = $this->cacheKey($fullQuery);
         $miss = new \stdClass();
 
         // if the key exists then return the cached version; compared against a
         // sentinel so a legitimately empty or null result still counts as a hit.
-        $fromCache = $cache->get($fullQuery, $miss);
+        $fromCache = $cache->get($key, $miss);
 
         if ($miss !== $fromCache) {
             return $fromCache;
@@ -91,7 +114,7 @@ class ConnectionProxy implements ConnectionInterface
 
         $result = $next();
 
-        $cache->set($fullQuery, $result);
+        $cache->set($key, $result);
 
         return $result;
     }
@@ -100,8 +123,9 @@ class ConnectionProxy implements ConnectionInterface
      * Run a write, then drop every cached read.
      *
      * Invalidation is deliberately coarse. The cache is a single bucket keyed by
-     * SQL string, so there is no reliable way to tell which entries a given write
-     * touched; clearing all of them is the only conservative choice. Writes that
+     * database identity plus SQL string, so there is no reliable way to tell which
+     * entries a given write touched; clearing all of them -- other databases'
+     * included -- is the only conservative choice. Writes that
      * bypass this proxy (raw `DB::table()` calls, for instance) cannot invalidate
      * anything -- see the caveats in docs/Base/Model.md.
      */

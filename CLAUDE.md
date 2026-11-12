@@ -78,7 +78,9 @@ Request flow: route → `Utility\Controller` → `Utility\AbstractRepository` �
   returns a `ConnectionProxy` from `getConnection()`, and `selectOne`/`select`/`scalar` route through `cacheOrNext()`
   backed by the `array` cache store (`cursor()` is *not* cached — it streams straight through). Writes
   (`insert`/`update`/`delete`/`statement`/`affectingStatement`/`unprepared`) run through `writeAndInvalidate()`, which
-  flushes the **whole** bucket afterwards — entries are keyed by SQL string, so selective eviction isn't possible.
+  flushes the **whole** bucket afterwards — entries are keyed by database identity (`cacheKey()`: connection name,
+  host, port, `getDatabaseName()`, pgsql `search_path`/`schema`) plus the resolved SQL, so selective eviction isn't
+  possible, and repointing a connection (multi-database tenancy) never shares entries across databases.
   `shouldCache()` additionally refuses to cache locking reads (`for update`, `lock in share mode`, sqlsrv hints) and
   anything read while `transactionLevel() > 0`, so a cached row can never replace a real row lock or survive a
   rollback. `config('repository.disable_cache')` kills it globally; `disableCache()`/`enableCache()`/`clearCache()`

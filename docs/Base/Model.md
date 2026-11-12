@@ -21,7 +21,7 @@ It is enabled by default on every model extending `Shamaseen\Repository\Utility\
 
 ### How it works
 
-The trait replaces the model's database connection with a thin `ConnectionProxy`. Every `select` / `selectOne` / `scalar` call builds a cache key from the fully-resolved SQL string. On a cache hit the result is returned immediately; on a miss the real query runs and the result is stored before being returned.
+The trait replaces the model's database connection with a thin `ConnectionProxy`. Every `select` / `selectOne` / `scalar` call builds a cache key from the identity of the database the connection currently points at (connection name, host, port, database name, and Postgres `search_path` / `schema`) plus the fully-resolved SQL string. On a cache hit the result is returned immediately; on a miss the real query runs and the result is stored before being returned.
 
 ### How long "per request" lasts
 
@@ -38,6 +38,19 @@ Entries live in `RequestCacheStore`, which the package registers as a **scoped**
 > **Before 4.3.0** entries were kept in `Cache::store('array')`. That store hangs off the `CacheManager` **singleton**, which nothing ever resets, so under `queue:work` cached rows survived from one job to the next for the life of the worker process — unbounded staleness plus a cache that only grew. If you relied on reading the package's entries out of `Cache::store('array')` directly, resolve `Shamaseen\Repository\Utility\Models\RequestCacheStore` from the container instead.
 
 Note the last row: a `schedule:run`, an `artisan` command that runs for hours, or a `tinker` session is one long "request" as far as this cache is concerned. Call `clearCache()` at a natural boundary in those, or disable the cache for that model.
+
+### Multiple databases / tenancy
+
+Repointing a connection at another database is safe. Because the database's identity is part of every cache key, the same query against two databases is two separate entries, even when both go through the same connection name. That covers:
+
+- multi-database tenancy packages such as stancl/tenancy, which switch the `tenant` connection on every tenant switch,
+- changing `database.connections.*` config and calling `DB::purge()` yourself,
+- `DB::connection()->setDatabaseName()`,
+- Postgres schema-per-tenant setups that change the connection's `search_path` / `schema` config.
+
+No tenancy bootstrapper that flushes the cache is needed, including in a command that loops over tenants in one process.
+
+> **Before 4.3.1** the key was the SQL string alone, so after a tenant switch the second tenant could be served the first tenant's cached rows.
 
 ### What invalidates the cache
 
@@ -65,6 +78,8 @@ Some reads are always sent to the database, regardless of the flags below:
 
 - **Writes that bypass the model are invisible to the cache.** A raw `DB::table('accounts')->update(...)`, a raw PDO statement, or a database trigger does not go through the proxy and therefore does not invalidate anything. Route writes through the model, or call `clearCache()` yourself.
 - **Another process writing the same row cannot invalidate your cache.** The cache is per-process and lives for one request or one queue job; it makes no cross-process guarantees. A row read early in a job can be stale by the end of that job if another worker updated it.
+- **Switching database or schema with a raw statement can't be detected.** `USE other_db`, `SET search_path TO ...` and similar statements change the database on the open connection without changing its config, so the cache key stays the same. Call `clearCache()` right after such a statement.
+- **A write in one database also clears cached reads from other databases.** The cache is one bucket for every database, so every write empties all of it. This is safe but can mean extra queries when a request works across several databases.
 - **Overriding `getRequestCacheKey()` splits the cache into separate buckets.** A write made through one model then only flushes that model's bucket. Only override it if you understand that consequence.
 
 ### Disabling cache globally
